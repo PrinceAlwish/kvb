@@ -1,0 +1,1392 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KVB Exam Revision Platform</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/showdown/1.9.1/showdown.min.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f0f4f8;
+        }
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #3b82f6;
+            font-weight: 600;
+        }
+        .prose-custom {
+            max-width: none;
+        }
+        .prose-custom h1, .prose-custom h2, .prose-custom h3, .prose-custom h4 {
+            color: #1e3a8a;
+        }
+        .prose-custom ul > li::before {
+            background-color: #3b82f6;
+        }
+        .highlight {
+            background-color: yellow;
+        }
+        .self-score-btn {
+            background-color: #10b981;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            margin-top: 8px;
+            cursor: pointer;
+        }
+        .self-score-btn:disabled {
+            background-color: #6b7280;
+            cursor: not-allowed;
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body class="antialiased text-slate-800">
+
+    <!-- Main Container -->
+    <div id="app" class="min-h-screen flex flex-col">
+        
+        <!-- Header -->
+        <header class="bg-white shadow-md sticky top-0 z-20">
+            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="flex items-center justify-between h-16">
+                    <div class="flex items-center">
+                        <svg class="h-8 w-8 text-blue-600" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v11.494m-9-5.747h18"/>
+                        </svg>
+                        <span class="ml-2 text-xl font-bold text-gray-800">KVB VetPrep</span>
+                    </div>
+                    <div id="auth-container" class="flex items-center space-x-2">
+                        <span id="user-id-display" class="text-xs text-gray-500 font-mono"></span>
+                    </div>
+                </div>
+                <!-- Tabs -->
+                <nav class="flex border-b border-gray-200">
+                    <button data-tab="dashboard" class="py-4 px-1 text-sm font-medium text-gray-500 hover:text-gray-700 tab-active">Dashboard</button>
+                    <button data-tab="notes" class="py-4 px-1 ml-8 text-sm font-medium text-gray-500 hover:text-gray-700">Study Notes</button>
+                    <button data-tab="quiz" class="py-4 px-1 ml-8 text-sm font-medium text-gray-500 hover:text-gray-700">Practice Quizzes</button>
+                    <button data-tab="mock" class="py-4 px-1 ml-8 text-sm font-medium text-gray-500 hover:text-gray-700">Mock Exam</button>
+                    <button data-tab="analytics" class="py-4 px-1 ml-8 text-sm font-medium text-gray-500 hover:text-gray-700">Analytics</button>
+                    <button data-tab="glossary" class="py-4 px-1 ml-8 text-sm font-medium text-gray-500 hover:text-gray-700">Glossary</button>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto p-4 sm:p-6 lg:p-8">
+            <!-- Dashboard -->
+            <div id="dashboard-content" class="tab-content">
+                <h1 class="text-3xl font-bold text-gray-900 mb-4">Welcome to your KVB Exam Dashboard</h1>
+                <p class="text-lg text-gray-600 mb-6">Your centralized hub for exam preparation. Track your progress and access all study materials from here.</p>
+                
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Exam Rules -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg col-span-1 md:col-span-2">
+                        <h2 class="text-xl font-semibold text-blue-800 mb-4">Key Exam Information</h2>
+                        <ul class="space-y-4">
+                            <li class="flex items-start">
+                                <svg class="h-6 w-6 text-green-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div><span class="font-bold">Pass Mark:</span> <span class="text-green-600 font-semibold">50% aggregated</span>. Consistent practice is key to meeting this target.</div>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-6 w-6 text-yellow-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                                <div><span class="font-bold">Exam Duration:</span> Written exams are typically <span class="font-semibold">3 hours per paper</span> over two days. Our mock exam simulates this to build your stamina.</div>
+                            </li>
+                            <li class="flex items-start">
+                                <svg class="h-6 w-6 text-red-500 mr-3 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" /></svg>
+                                <div><span class="font-bold">Maximum Attempts:</span> You are allowed a maximum of <span class="font-semibold text-red-600">three (3) attempts</span>. Make each one count!</div>
+                            </li>
+                        </ul>
+                    </div>
+                    <!-- Quick Actions -->
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold text-blue-800 mb-4">Quick Actions</h2>
+                        <div class="space-y-3">
+                            <button onclick="switchTab('quiz')" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">Start a New Quiz</button>
+                            <button onclick="switchTab('mock')" class="w-full bg-gray-700 text-white font-bold py-3 px-4 rounded-lg hover:bg-gray-800 transition duration-300">Begin Mock Exam</button>
+                            <button onclick="switchTab('notes')" class="w-full bg-gray-200 text-gray-800 font-bold py-3 px-4 rounded-lg hover:bg-gray-300 transition duration-300">Browse Study Notes</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Activity -->
+                <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold text-blue-800 mb-4">Recent Quiz Performance</h2>
+                    <div id="recent-activity-container">
+                        <p class="text-gray-500">No recent activity. Take a quiz to see your results here.</p>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Study Notes -->
+            <div id="notes-content" class="tab-content hidden">
+                <div class="flex flex-col md:flex-row gap-6">
+                    <!-- Topics List -->
+                    <div class="md:w-1/4">
+                        <h2 class="text-2xl font-bold mb-4">Topics</h2>
+                        <div class="bg-white p-4 rounded-lg shadow-md max-h-[70vh] overflow-y-auto">
+                            <div id="topics-list" class="space-y-2"></div>
+                        </div>
+                    </div>
+                    <!-- Note Content -->
+                    <div class="md:w-3/4">
+                        <div class="flex justify-between items-center mb-4">
+                             <h2 id="note-title" class="text-2xl font-bold">Select a topic to begin</h2>
+                             <div>
+                                <button id="highlight-btn" class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-2 px-4 rounded-lg">Highlight Text</button>
+                             </div>
+                        </div>
+                        <div id="note-content-area" class="bg-white p-6 rounded-lg shadow-md prose prose-custom max-h-[70vh] overflow-y-auto">
+                            <p>Your study notes will appear here. You can use the highlight tool to mark important sections.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Practice Quizzes -->
+            <div id="quiz-content" class="tab-content hidden">
+                <!-- Quiz Setup -->
+                <div id="quiz-setup" class="bg-white p-8 rounded-lg shadow-lg max-w-2xl mx-auto">
+                    <h2 class="text-2xl font-bold text-center mb-6">Create a Custom Quiz</h2>
+                    <div class="space-y-6">
+                        <div>
+                            <label for="quiz-topic" class="block text-sm font-medium text-gray-700 mb-1">Select Topic</label>
+                            <select id="quiz-topic" class="w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500"></select>
+                        </div>
+                        <div>
+                            <label for="num-questions" class="block text-sm font-medium text-gray-700 mb-1">Number of Questions (max 50)</label>
+                            <input type="number" id="num-questions" value="10" min="1" max="50" class="w-full p-2 border border-gray-300 rounded-md shadow-sm">
+                        </div>
+                        <button id="start-quiz-btn" class="w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">Start Quiz</button>
+                    </div>
+                </div>
+                <!-- Quiz Active -->
+                <div id="quiz-active" class="hidden"></div>
+                <!-- Quiz Results -->
+                <div id="quiz-results" class="hidden"></div>
+            </div>
+
+            <!-- Mock Exam -->
+            <div id="mock-content" class="tab-content hidden">
+                 <!-- Mock Exam Setup -->
+                 <div id="mock-setup" class="bg-white p-8 rounded-lg shadow-lg max-w-2xl mx-auto text-center">
+                    <h2 class="text-3xl font-bold mb-4">Full-Length Mock Exam</h2>
+                    <p class="text-gray-600 mb-6">This exam simulates the real KVB written paper. It consists of 100 questions (a mix of MCQ and SAQ) and you will have 3 hours to complete it. Find a quiet place and test your knowledge under pressure.</p>
+                    <button id="start-mock-btn" class="bg-red-600 text-white font-bold py-3 px-6 rounded-lg hover:bg-red-700 transition duration-300 text-lg">Begin Mock Exam</button>
+                </div>
+                 <!-- Mock Exam Active -->
+                 <div id="mock-active" class="hidden"></div>
+                 <!-- Mock Results -->
+                 <div id="mock-results" class="hidden"></div>
+            </div>
+
+            <!-- Analytics -->
+            <div id="analytics-content" class="tab-content hidden">
+                <h1 class="text-3xl font-bold text-gray-900 mb-6">Performance Analytics</h1>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold text-blue-800 mb-4">Overall Score History</h2>
+                        <canvas id="score-history-chart"></canvas>
+                    </div>
+                    <div class="bg-white p-6 rounded-lg shadow-lg">
+                        <h2 class="text-xl font-semibold text-blue-800 mb-4">Performance by Topic</h2>
+                        <canvas id="topic-performance-chart"></canvas>
+                    </div>
+                </div>
+                <div class="mt-8 bg-white p-6 rounded-lg shadow-lg">
+                    <h2 class="text-xl font-semibold text-blue-800 mb-4">Study Recommendations</h2>
+                    <div id="weak-topics-container">
+                        <p class="text-gray-500">Complete some quizzes to get personalized recommendations on topics you should focus on.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Glossary -->
+            <div id="glossary-content" class="tab-content hidden">
+                 <h1 class="text-3xl font-bold text-gray-900 mb-4">Interactive Glossary</h1>
+                 <div class="mb-4">
+                     <input type="text" id="glossary-search" placeholder="Search for a term..." class="w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-blue-500 focus:border-blue-500">
+                 </div>
+                 <div id="glossary-list" class="bg-white p-4 rounded-lg shadow-md max-h-[70vh] overflow-y-auto space-y-4">
+                 </div>
+            </div>
+
+        </main>
+        
+        <!-- Footer -->
+        <footer class="bg-white mt-8">
+            <div class="container mx-auto py-4 px-8 text-center text-gray-500">
+                <p>&copy; 2025 KVB VetPrep. All Rights Reserved.</p>
+            </div>
+        </footer>
+
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full hidden z-30">
+        <div class="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+            <div class="mt-3 text-center">
+                <div id="modal-content" class="mt-2 px-7 py-3">
+                    <!-- Modal content goes here -->
+                </div>
+                <div class="items-center px-4 py-3">
+                    <button id="modal-close" class="px-4 py-2 bg-blue-500 text-white text-base font-medium rounded-md w-full shadow-sm hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-300">
+                        Close
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase and App Logic -->
+    <script type="module">
+        // Firebase Imports - Mocked for self-contained functionality
+        const initializeApp = (config) => ({});
+        const getAuth = (app) => ({}); // Returns a dummy auth object
+        const onAuthStateChanged = (auth, cb) => setTimeout(() => cb({ uid: 'localUser123' }), 100);
+        const signInAnonymously = (auth) => Promise.resolve({ user: { uid: 'localUser123' } });
+        const getFirestore = (app) => ({});
+        // Mock Firestore functions to prevent errors
+        const collection = () => ({});
+        const addDoc = () => Promise.resolve();
+        const query = () => ({});
+        const onSnapshot = (q, cb) => setTimeout(() => cb({ docs: [] }), 100);
+
+        // --- DATA STORE ---
+        const dbData = {
+            topics: [
+                { id: "arthrology", name: "Arthrology (Joints)" },
+                { id: "female_repo", name: "Female Reproductive System" },
+                { id: "male_repo", name: "Male Reproductive System" },
+                { id: "osteology", name: "Osteology & Skeletal System" },
+                { id: "myology", name: "Myology (Muscles)" },
+                { id: "embryology", name: "Embryology" },
+                { id: "cardiovascular", name: "Cardiovascular Physiology" },
+            ],
+            notes: {
+                female_repo: `
+### General Overview
+The female reproductive system is designed for ova production, fertilization, fetal development, and parturition. It consists of the ovaries, oviducts, uterus, cervix, vagina, external genitalia, and mammary glands.
+
+### Ovaries (Female Gonads)
+- **Location**: Located in the dorsal abdominal cavity, caudal to the kidneys. They are retroperitoneal, supported by a mesentery called the mesovarium.
+- **Function**: Produce ova (gametes) and hormones (estrogen, progesterone).
+- **Structure**:
+    - **Tunica Albuginea**: Outer connective tissue capsule.
+    - **Cortex**: The outer region where ova develop within follicles. Contains interstitial cells with endocrine functions.
+    - **Medulla**: The central region, primarily containing blood vessels.
+- **Species Differences**:
+    - **Bovine (Ruminants)**: Ovoid shape. Mature follicles or corpora lutea are palpable per rectum.
+    - **Swine**: Appear like a 'bunch of grapes' due to multiple follicles and corpora lutea on the surface.
+
+### Oviducts (Fallopian Tubes)
+- **Function**: Site of fertilization. They are paired, convoluted tubes that transport the ovulated follicle.
+- **Structure**:
+    - **Infundibulum**: A funnel-shaped structure surrounding the ovary. Its edges have fimbriae that guide the ovulated follicle into the oviduct.
+    - **Mid-section (Ampulla & Isthmus)**: A highly coiled tube supported by the mesosalpinx. Its wall contains smooth muscle (tunica muscularis) and a folded mucosa with ciliated epithelium to move the embryo towards the uterus.
+
+### Uterus
+- **Function**: Site of fetal development, placentation, and parturition.
+- **Structure**:
+    - **Type**: Most domestic animals have a **bicornuate** uterus with two uterine horns. Horns are long in swine (litter-bearing) and shorter in ruminants.
+    - **Uterine Body**: The point where the two horns unite. It's relatively short in domestic animals.
+    - **Uterine Wall**:
+        - **Endometrium (Tunica Mucosa)**: Inner lining with a high density of glands secreting "uterine milk." In ruminants, it has non-glandular projections called **caruncles**, which are sites of placental attachment.
+        - **Myometrium (Tunica Muscularis)**: Thick smooth muscle layers that proliferate during pregnancy and contract forcefully during birth.
+        - **Perimetrium (Tunica Serosa)**: The outer layer, a continuation of the broad ligament.
+- **Support**: The uterus is supported by the **broad ligament**, which consists of the mesometrium (uterus), mesosalpinx (oviduct), and mesovarium (ovary).
+
+### Cervix
+- **Function**: A thick muscular sphincter that protects the uterus by remaining tightly closed, except during estrus (to allow sperm entry) and parturition.
+- **Structure**:
+    - **Annular Folds/Rings**: Strong circular ridges that close the cervix in ruminants.
+    - **Spiral Folds**: In swine, the folds are arranged spirally.
+    - **Vaginal Fornix**: A blind-ended pocket surrounding the protrusion of the cervix into the vagina, prominent in the mare.
+
+### Vagina, Vestibule, and Vulva
+- **Vagina**: A tubular organ connecting the cervix to the exterior.
+- **Vestibule**: The section common to both reproductive and urinary systems, where the urethra opens. Contains mucus glands.
+- **Vulva**: The external genitalia, consisting of the labia majora and minora, which meet at the dorsal and ventral commissures. The **clitoris**, an erectile tissue homologous to the male penis, is located at the ventral commissure.
+
+### Mammary Glands (Mammae)
+- **Origin**: Modified sudoriferous (sweat) glands of cutaneous origin.
+- **Development**: Arise from bilateral **mammary ridges** (milk lines) along the ventro-lateral ectoderm during embryonic development.
+- **Structure of the Cow Udder**:
+    - Consists of four separate glands (quarters).
+    - **Suspensory Apparatus**: A robust system of ligaments that supports the udder's weight.
+        - **Medial Suspensory Ligament**: Elastic tissue from the linea alba, forming a central partition.
+        - **Lateral Laminae**: Dense, less elastic fibrous tissue from the prepubic tendon.
+    - **Duct System**:
+        - **Alveoli**: Secretory tissue where milk is produced.
+        - **Gland Cistern**: A large cavity within each quarter that collects milk.
+        - **Teat Cistern**: Cavity within the teat.
+        - **Streak Canal (Ostium Papillae)**: Drains the teat cistern and is closed by a smooth muscle sphincter.
+- **Blood Supply**: The **external pudendal artery** is the primary arterial supply. Venous drainage is via the **external pudendal vein** and the subcutaneous abdominal vein (milk vein).
+                `,
+                male_repo: `
+### General Overview
+The male reproductive system is designed for the production and delivery of spermatozoa. It comprises the testes, a duct system, accessory sex glands, and the penis, and is closely integrated with the urinary system (urogenital system).
+
+### Testis (Testicles/Gonads)
+- **Function**: Synthesize spermatozoa (spermatogenesis) and produce testosterone.
+- **Development & Location**: Develops at the fetal gonadal ridge and descends into the scrotum pre-partum. This external location is crucial for maintaining a temperature slightly lower than the body, which is required for spermatogenesis.
+- **Structure**:
+    - **Seminiferous Tubules**: Functional tissue of the testis where sperm production occurs. The lumen is lined with Sertoli cells that support developing germ cells (spermatogonia).
+    - **Leydig (Interstitial) Cells**: Located between tubules, they produce testosterone in response to Luteinizing Hormone (LH).
+    - **Tunica Albuginea**: An inelastic fibrous capsule surrounding the testicular tissue.
+- **Orientation**: The long axis is vertical in ruminants but horizontal in man and stallion.
+
+### Scrotum
+- **Function**: A cutaneous sac that houses the testes and regulates their temperature.
+- **Layers**:
+    - **Skin**: Thin and pliable.
+    - **Tunica Dartos**: A layer of fibroelastic tissue and smooth muscle. It contracts in cold to bring the testes closer to the body and relaxes in heat.
+    - **Vaginal Tunic**: A derivative of the peritoneum that covers the testis.
+
+### Duct System
+This system transports, matures, and stores sperm.
+- **Rete Testis**: A network of tubules that collects sperm from the seminiferous tubules.
+- **Efferent Ductules**: Connect the rete testis to the epididymis.
+- **Epididymis**: A long, coiled tube attached to the testis, divided into a head (caput), body (corpus), and tail (cauda). It is the site of sperm maturation and storage.
+- **Ductus Deferens (Vas Deferens)**: Transports sperm from the epididymis to the pelvic urethra.
+- **Urethra**: A tube that carries both urine and semen out of the body through the penis.
+
+### Spermatic Cord & Inguinal Canal
+- **Spermatic Cord**: Suspends the testis in the scrotum and contains the ductus deferens, testicular artery, and veins.
+- **Pampiniform Plexus**: A counter-current heat exchange system formed by the coiling of the testicular artery and vein. It cools arterial blood before it reaches the testis.
+- **Inguinal Canal**: A passage connecting the abdominal cavity to the scrotum, allowing for the descent of the testes and passage of the spermatic cord.
+
+### Accessory Sex Glands
+These glands produce seminal plasma, which mixes with sperm to form semen.
+- **Ampulla**: Glandular enlargement of the terminal ductus deferens. Absent in swine.
+- **Vesicular Glands (Seminal Vesicles)**: Paired glands that contribute a significant volume of fluid, including fructose (energy for sperm).
+- **Prostate Gland**: An unpaired gland that surrounds the pelvic urethra.
+- **Bulbourethral (Cowper's) Glands**: Paired glands that produce a pre-ejaculatory fluid to cleanse the urethra. They are large in the boar.
+
+### Penis
+The male organ of copulation. It is divided into a root, body, and glans.
+- **Structural Types**:
+    - **Fibroelastic**: Contains a high proportion of connective tissue, making it firm even when not erect. Erection is achieved by straightening the **sigmoid flexure**, an S-shaped bend in the penis. Found in bulls, rams, and boars.
+    - **Musculocavernosus**: Contains large cavernous spaces that engorge with blood during erection. Found in stallions and man.
+- **Erectile Tissues**:
+    - **Corpus Cavernosum**: Paired dorsal erectile bodies.
+    - **Corpus Spongiosum**: Unpaired ventral tissue that surrounds the urethra.
+- **Muscles**:
+    - **Retractor Peni Muscle**: Paired smooth muscles that hold the sigmoid flexure in place. They relax during erection.
+                `,
+                arthrology: `
+### Introduction to Arthrology
+Arthrology is the scientific study of joints, which are points where two or more bones articulate or meet. Joints can be classified based on the type of uniting tissue and the degree of movement they permit.
+
+### Classification by Uniting Tissue & Movement
+
+#### 1. Fibrous Joints (Synarthroses)
+- **Characteristics**: Immovable joints united by dense fibrous connective tissue. They lack a joint cavity.
+- **Types**:
+    - **Sutures**: Found between the bones of the skull. The narrow strips of fibrous tissue ossify with maturity to form a **synostosis** (a bony union).
+    - **Syndesmosis**: Bones are united by ligaments or fibrous sheets, allowing for limited movement. Example: the connection between the shafts of the radius and ulna.
+    - **Gomphosis**: The specialized joint between a tooth and its alveolar socket in the mandible or maxilla, anchored by the periodontal ligament.
+
+#### 2. Cartilaginous Joints (Amphiarthroses)
+- **Characteristics**: Slightly movable joints where bones are united by cartilage.
+- **Types**:
+    - **Synchondrosis**: Bones are joined by hyaline cartilage. These are often temporary joints, such as the epiphyseal plate (growth plate) between the epiphysis and diaphysis of a long bone, which later ossifies.
+    - **Symphysis**: Bones are covered by hyaline cartilage but are united by a pad of fibrocartilage. Example: the pelvic symphysis and intervertebral discs.
+
+#### 3. Synovial Joints (Diarthroses)
+- **Characteristics**: Freely movable joints, characterized by several key features:
+    - **Joint Capsule**: A fibrous sac that encloses the joint. It has an outer fibrous layer and an inner synovial membrane.
+    - **Synovial Membrane**: Secretes synovial fluid.
+    - **Synovial Fluid**: A viscous lubricant that fills the joint cavity, reducing friction and nourishing the articular cartilage.
+    - **Joint Cavity**: A fluid-filled space between the articulating bones.
+    - **Articular Cartilage**: A smooth layer of hyaline cartilage covering the ends of the bones, providing a low-friction surface.
+    - **Ligaments**: Strong fibrous bands that connect bone to bone, providing stability. They can be extrinsic (outside the capsule) or intrinsic (within the capsule, like the cruciate ligaments of the stifle).
+
+### Types of Synovial Joints (by Shape and Movement)
+- **Plane (Arthrodial) Joint**: Allows for sliding or gliding movements. Found between carpal bones or articular processes of vertebrae.
+- **Hinge (Ginglymus) Joint**: Allows movement in one plane (flexion and extension). Example: elbow joint.
+- **Pivot (Trochoid) Joint**: Allows rotation around a central axis. Example: atlanto-axial joint ('no' joint).
+- **Condylar Joint**: An ovoid condyle fits into an elliptical cavity, allowing movement in two planes (flexion/extension and abduction/adduction). Example: femoro-tibial (stifle) joint.
+- **Ball-and-Socket (Spheroidal) Joint**: A spherical head fits into a cup-like socket, allowing for universal movement (flexion, extension, abduction, adduction, circumduction, rotation). Example: hip joint.
+
+### Description of Joint Movements
+- **Flexion**: Decreases the angle of a joint.
+- **Extension**: Increases the angle of a joint.
+- **Adduction**: Movement of a limb towards the median plane.
+- **Abduction**: Movement of a limb away from the median plane.
+- **Circumduction**: A circular movement combining flexion, extension, adduction, and abduction.
+- **Rotation**: Turning a body part on its own long axis.
+                `,
+                osteology: `
+### Introduction to the Skeletal System
+Osteology is the study of bones, which form the body's framework, or skeleton. The skeleton is a living system that provides protection, support, leverage for movement, mineral storage, and is the site of blood cell formation (hemopoiesis).
+
+### Classification of the Skeleton
+The skeleton is divided into three main parts:
+1.  **Axial Skeleton**: Forms the central axis of the body. It includes the **skull**, **vertebral column**, **ribs**, and **sternum**.
+2.  **Appendicular Skeleton**: Comprises the bones of the limbs. This includes the **thoracic limb** (forelimb) and the **pelvic limb** (hindlimb).
+3.  **Splanchnic (Visceral) Skeleton**: Bones that develop within soft tissues, away from the rest of the skeleton. Examples include the *os cordis* in the heart of cattle and the *os penis* in the penis of dogs.
+
+### Classification of Bones by Shape
+- **Long Bones**: Longer than they are wide (e.g., femur, humerus). They act as levers for locomotion.
+- **Short Bones**: Cube-shaped (e.g., carpal and tarsal bones). They absorb concussion in complex joints.
+- **Flat Bones**: Thin and expanded (e.g., scapula, skull bones). They primarily serve a protective function or provide large surfaces for muscle attachment.
+- **Irregular Bones**: Complex and varied shapes (e.g., vertebrae).
+- **Sesamoid Bones**: Develop within tendons to reduce friction and change the angle of pull (e.g., patella or kneecap).
+- **Pneumatic Bones**: Contain air-filled spaces (sinuses), such as the frontal bones of the skull.
+
+### Structure of a Long Bone
+- **Diaphysis**: The central shaft, composed of dense **compact bone**.
+- **Epiphysis**: The expanded ends, composed mainly of **spongy (cancellous) bone**. The ends are covered with **articular cartilage**.
+- **Metaphysis**: The region between the diaphysis and epiphysis.
+- **Epiphyseal Plate (Growth Plate)**: A layer of hyaline cartilage within the metaphysis of young, growing animals where bone elongation occurs.
+- **Periosteum**: A fibrous membrane covering the outer surface of the bone (except at articular surfaces). It is essential for bone growth in diameter, repair, and contains nerve and blood vessels.
+- **Medullary Cavity**: The hollow space within the diaphysis, containing bone marrow.
+
+### The Axial Skeleton in Detail
+- **Vertebral Column**: A chain of irregular bones (vertebrae) extending from the skull to the tail. It is divided into five regions:
+    - **Cervical (C)**: Neck region (7 vertebrae in most mammals).
+    - **Thoracic (T)**: Chest region; articulates with the ribs (e.g., 13 in cattle).
+    - **Lumbar (L)**: Loin region (e.g., 6 in cattle).
+    - **Sacral (S)**: Pelvic region; vertebrae are fused to form the **sacrum**.
+    - **Caudal (Cd) or Coccygeal**: Tail region.
+- **Ribs**: Flat, curved bones that form the lateral walls of the thorax. They articulate dorsally with thoracic vertebrae.
+- **Sternum**: The breastbone, forming the floor of the thorax.
+
+### The Appendicular Skeleton in Detail
+- **Thoracic Limb (Forelimb)**:
+    - **Pectoral Girdle**: Scapula (shoulder blade).
+    - **Arm**: Humerus.
+    - **Forearm**: Radius and Ulna.
+    - **Manus (Hand)**: Carpal bones (wrist), Metacarpal bones, and Phalanges (digits).
+- **Pelvic Limb (Hindlimb)**:
+    - **Pelvic Girdle**: Ilium, Ischium, and Pubis (fused to form the os coxae or hip bone).
+    - **Thigh**: Femur.
+    - **Leg (Crus)**: Tibia and Fibula.
+    - **Pes (Foot)**: Tarsal bones (hock), Metatarsal bones, and Phalanges (digits).
+                `,
+                myology: `
+### Introduction to Myology
+Myology is the study of the muscular system. Muscles are specialized contractile tissues responsible for movement, posture maintenance, and heat generation. They are classified based on their histology (microscopic structure) and function.
+
+### Histological Classification of Muscle
+
+#### 1. Skeletal Muscle
+- **Appearance**: Striated (striped).
+- **Control**: Voluntary (under conscious control).
+- **Structure**: Composed of long, unbranched, multinucleated cells called myofibres.
+- **Function**: Attached to the skeleton, these muscles produce movement of the limbs and body.
+
+#### 2. Cardiac Muscle
+- **Appearance**: Striated.
+- **Control**: Involuntary.
+- **Structure**: Found only in the heart wall (myocardium). Cells are branched and interconnected by **intercalated discs**, which allow for synchronized contraction. Nuclei are centrally located.
+- **Function**: Pumps blood throughout the body.
+
+#### 3. Smooth Muscle
+- **Appearance**: Non-striated (smooth).
+- **Control**: Involuntary.
+- **Structure**: Composed of spindle-shaped, single-nucleated cells.
+- **Function**: Found in the walls of hollow organs (e.g., digestive tract, blood vessels, uterus). Responsible for processes like peristalsis and regulation of blood pressure.
+
+### Gross Anatomy of a Skeletal Muscle
+- **Belly**: The thick, fleshy, contractile part of the muscle.
+- **Attachments**:
+    - **Tendon**: A tough, fibrous cord of connective tissue that attaches muscle to bone.
+    - **Aponeurosis**: A broad, flat sheet of tendinous tissue.
+- **Origin and Insertion**:
+    - **Origin**: The more fixed or proximal point of attachment.
+    - **Insertion**: The more movable or distal point of attachment.
+
+### Muscle Actions and Groups
+Muscles work in coordinated groups to produce movement.
+- **Agonist (Prime Mover)**: The muscle primarily responsible for a specific movement.
+- **Antagonist**: A muscle that opposes the action of the agonist. (e.g., biceps brachii is the antagonist to the triceps brachii).
+- **Synergist**: A muscle that assists the agonist in its action or stabilizes a joint.
+
+### Key Skeletal Muscle Groups
+
+- **Girdle Muscles (Extrinsic)**: Arise from the trunk and attach to the limbs, forming a muscular sling (synsarcosis) that supports the body. Examples include the trapezius and serratus ventralis.
+- **Intrinsic Muscles of the Forelimb**: Originate and insert on the limb itself.
+    - **Shoulder**: Supraspinatus, Infraspinatus (lateral); Subscapularis (medial).
+    - **Elbow**: Biceps brachii (flexor); Triceps brachii (extensor).
+- **Intrinsic Muscles of the Hindlimb**:
+    - **Hip Extensors (Hamstrings)**: Biceps femoris, Semitendinosus, Semimembranosus.
+    - **Stifle (Knee) Extensors (Quadriceps)**: A group of four muscles (Rectus femoris, Vastus lateralis, medialis, and intermedius).
+- **Muscles of Mastication**: Masseter, Temporalis (close the jaw); Digastricus (opens the jaw).
+- **Muscles of Respiration**:
+    - **Diaphragm**: The primary muscle of inspiration.
+    - **Intercostal Muscles**: Muscles between the ribs that aid in inspiration (external) and expiration (internal).
+- **Abdominal Muscles**: External and internal obliques, rectus abdominis. They support the abdominal viscera and aid in functions like defecation and parturition.
+                `,
+                embryology: `
+### Introduction to Embryology
+Embryology is the study of the formation and development of an embryo from fertilization to the fetal stage. It involves a sequence of transformative events including cell division, differentiation, and morphogenesis.
+
+### Key Early Stages
+
+#### 1. Fertilization
+- **Definition**: The fusion of a haploid sperm and a haploid oocyte to form a single diploid cell called a **zygote**.
+- **Location**: Typically occurs in the oviduct (fallopian tube).
+
+#### 2. Cleavage
+- **Definition**: A series of rapid mitotic divisions of the zygote.
+- **Process**: The overall size of the embryo does not increase, but the zygote is partitioned into numerous smaller cells called **blastomeres**.
+- **Result**: Cleavage leads to the formation of a solid ball of cells known as the **morula**.
+
+#### 3. Blastulation
+- **Definition**: The process where the morula develops a fluid-filled cavity.
+- **Result**: This creates the **blastocyst**, which consists of:
+    - **Trophoblast**: An outer layer of cells that will contribute to the fetal portion of the placenta (chorion).
+    - **Inner Cell Mass (ICM or Embryoblast)**: A cluster of cells inside the blastocyst that will develop into the embryo itself.
+    - **Blastocoele**: The fluid-filled cavity.
+
+#### 4. Gastrulation
+- **Definition**: The most critical phase of development, where the blastocyst is reorganized into a three-layered structure (gastrula).
+- **Process**: Cells from the inner cell mass migrate and differentiate to form the three **primary germ layers**. The process begins with the formation of the **primitive streak** on the surface of the embryo, which establishes the longitudinal axis.
+
+### The Primary Germ Layers
+These three layers are the precursors to all tissues and organs in the body.
+1.  **Ectoderm (Outer Layer)**: Forms the nervous system (brain, spinal cord) and the epidermis (outer layer of skin, hair, nails).
+2.  **Mesoderm (Middle Layer)**: Forms muscle, bone, cartilage, connective tissue, the cardiovascular system (heart, blood vessels), kidneys, and gonads.
+3.  **Endoderm (Inner Layer)**: Forms the epithelial lining of the digestive tract, respiratory tract, liver, and pancreas.
+
+### Neurulation
+- **Definition**: The formation of the neural tube, which is the precursor to the central nervous system.
+- **Process**: The **notochord** (a rod of mesodermal cells) induces the overlying ectoderm to thicken and form the **neural plate**. The neural plate then folds inward to create the **neural groove**, and the edges fuse to form the **neural tube**.
+- **Neural Crest Cells**: A unique population of cells that detach during neural tube formation. They migrate throughout the body and differentiate into a wide variety of cell types, including peripheral nerves, pigment cells, and parts of the skull.
+
+### Fetal Membranes
+These membranes support and protect the developing embryo/fetus.
+- **Chorion**: The outermost membrane, formed from the trophoblast. It makes contact with the uterine lining to form the placenta.
+- **Amnion**: A membrane that encloses the embryo in a fluid-filled sac (amniotic fluid), providing protection from mechanical shock.
+- **Allantois**: An outgrowth of the hindgut that becomes a vascularized sac. It fuses with the chorion (forming the chorioallantoic membrane) to establish the functional vessels of the placenta and also serves to store urinary waste.
+- **Yolk Sac**: An endoderm-lined sac that provides early nourishment. While vital in egg-laying species, its nutritive role is reduced in mammals, but it is important for early blood cell formation.
+                `,
+                cardiovascular: `
+### Overview of the Cardiovascular System
+The cardiovascular system consists of the heart, blood vessels, and blood. The heart acts as a dual pump, driving two distinct circuits: the **pulmonary circulation** (to the lungs) and the **systemic circulation** (to the rest of the body).
+
+### The Heart and Cardiac Muscle
+- **Chambers**: The heart has four chambers: two atria (weak primer pumps) and two ventricles (strong muscular pumps).
+- **Myocardium**: The heart muscle, composed of specialized cardiac muscle cells.
+- **Syncytium**: Cardiac muscle fibers are extensively branched and connected by **intercalated discs**. These discs contain **gap junctions** that allow electrical impulses to spread rapidly, causing the heart to contract as a single, coordinated unit (a functional syncytium).
+
+### Myocardial Action Potential
+The electrical activity of cardiac muscle cells is distinct from skeletal muscle.
+- **Phases**:
+    1.  **Rapid Depolarization**: Fast sodium (Na+) channels open, causing a rapid influx of Na+ and a sharp rise in membrane potential.
+    2.  **Plateau Phase**: Slow calcium (Ca2+) channels open, allowing Ca2+ to enter the cell. This influx of positive ions balances the efflux of potassium (K+), holding the membrane potential at a plateau for about 0.2 seconds.
+    3.  **Repolarization**: Calcium channels close and potassium channels open, allowing K+ to exit the cell, which returns the membrane potential to its negative resting state.
+- **Significance of the Plateau**: The long plateau phase creates a long refractory period, preventing tetanus (sustained contraction) and ensuring the heart has time to fill with blood between beats.
+
+### The Cardiac Cycle
+The cardiac cycle describes the sequence of events during one heartbeat. It has two main phases:
+- **Diastole**: The period of ventricular relaxation and filling. The atrioventricular (AV) valves are open. Atrial contraction at the end of diastole ("atrial kick") tops off the ventricles with an additional 20% of blood.
+- **Systole**: The period of ventricular contraction and ejection.
+    - **Isovolumetric Contraction**: The ventricles begin to contract, causing the AV valves to close. Since both AV and semilunar valves are closed, pressure builds rapidly without a change in volume.
+    - **Ventricular Ejection**: When ventricular pressure exceeds the pressure in the aorta and pulmonary artery, the semilunar valves open, and blood is forcefully ejected.
+
+### Key Cardiac Volumes & Calculations
+- **End-Diastolic Volume (EDV)**: The volume of blood in a ventricle at the end of diastole (maximum filling).
+- **End-Systolic Volume (ESV)**: The volume of blood remaining in a ventricle at the end of systole.
+- **Stroke Volume (SV)**: The volume of blood ejected per beat. **SV = EDV - ESV**.
+- **Cardiac Output (CO)**: The total volume of blood pumped by a ventricle per minute. **CO = Heart Rate (HR) x Stroke Volume (SV)**.
+
+### Frank-Starling Law of the Heart
+- **Principle**: This fundamental law states that the stroke volume of the heart increases in response to an increase in the end-diastolic volume.
+- **Mechanism**: A greater EDV stretches the myocardial fibers more, leading to a more forceful contraction and a larger stroke volume. This allows the heart to automatically adjust its output to match venous return.
+
+### The Heart's Conduction System
+This system of specialized cells generates and coordinates the heartbeat.
+- **Sinoatrial (SA) Node**: The natural **pacemaker** of the heart, located in the right atrium. It has the fastest rate of spontaneous depolarization.
+- **Atrioventricular (AV) Node**: Located at the junction of the atria and ventricles. It delays the electrical impulse slightly, allowing the atria to fully contract before the ventricles.
+- **AV Bundle (Bundle of His) & Purkinje Fibers**: Conduct the impulse rapidly through the ventricles, ensuring a coordinated, bottom-up contraction.
+                `,
+            },
+            questions: [
+                // 100 Questions (60 MCQ, 40 SAQ)
+                // Arthrology
+                { topic: "arthrology", type: "mcq", question: "Which type of joint movement increases the angle between two segments of a limb?", options: ["Flexion", "Adduction", "Extension", "Translation"], answer: "Extension", explanation: "Extension increases the angle of a joint, typically straightening it." },
+                { topic: "arthrology", type: "mcq", question: "What type of joint is characterized by flat articular surfaces sliding on one another?", options: ["Hinge joint", "Condylar joint", "Plane joint", "Ball-and-socket joint"], answer: "Plane joint", explanation: "Plane joints (arthrodial joints) allow for gliding or sliding movements." },
+                { topic: "arthrology", type: "mcq", question: "What is the uniting medium in fibrous joints?", options: ["Cartilage", "Synovial fluid", "Dense connective tissue", "Ligaments only"], answer: "Dense connective tissue", explanation: "Fibrous joints are united by dense fibrous connective tissue, allowing for minimal to no movement." },
+                { topic: "arthrology", type: "mcq", question: "Which joint type allows for circumduction?", options: ["Hinge joint", "Ball-and-socket joint", "Plane joint", "Ellipsoidal joint"], answer: "Ball-and-socket joint", explanation: "Ball-and-socket joints offer the widest range of motion, including circumduction." },
+                { topic: "arthrology", type: "mcq", question: "Which of the following is NOT a characteristic feature of synovial joints?", options: ["Articular cartilages", "Fluid-filled joint cavity", "Absence of ligaments", "Joint capsule"], answer: "Absence of ligaments", explanation: "Ligaments are a key feature of synovial joints, providing stability." },
+                { topic: "arthrology", type: "mcq", question: "Sutures ossify with maturity to form what type of immovable joint unions?", options: ["Syndesmosis", "Synchondrosis", "Synostosis", "Gomphosis"], answer: "Synostosis", explanation: "A synostosis is the fusion of bones, which occurs when sutures ossify." },
+                { topic: "arthrology", type: "saq", question: "What is the study of joints?", answer: "Arthrology", explanation: "Arthrology is the scientific study of joints." },
+                { topic: "arthrology", type: "saq", question: "Points where two or more bones meet are called what?", answer: "Joints", explanation: "Joints, or articulations, are where bones connect." },
+                { topic: "arthrology", type: "saq", question: "Fibrous and cartilaginous joints allow what type of movement?", answer: "Minimal movement", explanation: "These joints are synarthroses or amphiarthroses, allowing little to no movement." },
+                { topic: "arthrology", type: "saq", question: "What attaches teeth to alveolar sockets in Gomphosis joints?", answer: "Periodontal ligaments", explanation: "The periodontal ligament is the fibrous tissue that anchors a tooth." },
+                { topic: "arthrology", type: "saq", question: "What forms the uniting medium in cartilaginous joints?", answer: "Cartilage", explanation: "Cartilage (either hyaline or fibrocartilage) unites bones in cartilaginous joints." },
+                { topic: "arthrology", type: "saq", question: "What fills the joint cavity of a synovial joint?", answer: "Synovial fluid", explanation: "Synovial fluid lubricates the joint and nourishes the articular cartilage." },
+                { topic: "arthrology", type: "saq", question: "What type of joint allows for pendular movement in one plane, like the elbow?", answer: "Hinge joint", explanation: "A hinge joint (ginglymus) permits flexion and extension." },
+                { topic: "arthrology", type: "saq", question: "What type of joint resembles a wheel and allows rotation about an axis?", answer: "Trochoid (Pivotal)", explanation: "A pivot or trochoid joint allows for rotation, like the atlanto-axial joint." },
+                { topic: "arthrology", type: "saq", question: "What are the two knuckle-shaped condyles of one bone in a condylar joint called?", answer: "Condyles", explanation: "Condyles are the rounded protuberances at the end of a bone in a condylar joint." },
+                { topic: "arthrology", type: "saq", question: "What type of joint describes a cone-like motion at the distal end of an extremity?", answer: "Circumduction", explanation: "Circumduction is the circular movement of a limb." },
+
+                // Female Repo
+                { topic: "female_repo", type: "mcq", question: "Where are the ovaries located in domestic animals?", options: ["Ventral and cranial to the kidneys", "Dorsal and caudal region of abdominal cavity just caudal to the kidneys", "Within the pelvic cavity", "Anterior to the uterine horns"], answer: "Dorsal and caudal region of abdominal cavity just caudal to the kidneys", explanation: "The ovaries are located dorsally in the abdomen, near the kidneys." },
+                { topic: "female_repo", type: "mcq", question: "Which structure is the site of fertilization in domestic animals?", options: ["Uterus", "Vagina", "Oviduct", "Cervix"], answer: "Oviduct", explanation: "Fertilization typically occurs in the oviduct (fallopian tube)." },
+                { topic: "female_repo", type: "mcq", question: "What type of epithelium lines the greatly folded mucosa of the oviduct?", options: ["Stratified squamous epithelium", "Simple cuboidal epithelium", "Simple columnar ciliated epithelium", "Transitional epithelium"], answer: "Simple columnar ciliated epithelium", explanation: "The cilia help propel the ovum or embryo toward the uterus." },
+                { topic: "female_repo", type: "mcq", question: "What are the mushroom-like projections in the endometrium of ruminants called?", options: ["Follicles", "Caruncles", "Corpora lutea", "Annular folds"], answer: "Caruncles", explanation: "Caruncles are the maternal sites of placental attachment in ruminants." },
+                { topic: "female_repo", type: "mcq", question: "Which ligament connects the right and left uterine horns anteriorly in bovine?", options: ["Mesovarium", "Mesometrium", "Intercornual ligament", "Broad ligament"], answer: "Intercornual ligament", explanation: "The intercornual ligament connects the two uterine horns." },
+                { topic: "female_repo", type: "mcq", question: "Which artery supplies arterial blood to the ovaries, oviduct, and cranial uterine horns?", options: ["Uterine artery", "Internal pudendal artery", "Ovarian artery", "External pudendal artery"], answer: "Ovarian artery", explanation: "The ovarian artery is the primary supply for the ovary and cranial reproductive tract." },
+                { topic: "female_repo", type: "mcq", question: "Mammary glands are modified sudoriferous glands that secrete what substance?", options: ["Hormones", "Lymph", "Milk", "Sweat"], answer: "Milk", explanation: "Mammary glands are modified sweat (sudoriferous) glands specialized for milk production." },
+                { topic: "female_repo", type: "mcq", question: "In ruminants, where are the mammary glands primarily found?", options: ["Axillary region", "Thoracic region", "Inguinal region", "Entire mammary lines"], answer: "Inguinal region", explanation: "The udder in ruminants is located in the inguinal (groin) region." },
+                { topic: "female_repo", type: "saq", question: "What are female gonads called?", answer: "Ovaries", explanation: "The ovaries are the female primary sex organs or gonads." },
+                { topic: "female_repo", type: "saq", question: "What is the outer connective capsule covering the ovary?", answer: "Tunica albuginea", explanation: "The tunica albuginea is the dense connective tissue layer covering the ovary." },
+                { topic: "female_repo", type: "saq", question: "In bovine, mature ova or corpus luteum distend which ovarian structure?", answer: "Tunica albuginea", explanation: "Developing structures protrude from the surface of the bovine ovary." },
+                { topic: "female_repo", type: "saq", question: "What are the paired convoluted tubes that are passages for ovulated follicles?", answer: "Oviducts", explanation: "The oviducts, or fallopian tubes, transport the ovum." },
+                { topic: "female_repo", type: "saq", question: "The mid-section of the fallopian tube is supported by what mesentery?", answer: "Mesosalpinx", explanation: "The mesosalpinx is the part of the broad ligament that supports the oviduct." },
+                { topic: "female_repo", type: "saq", question: "In domestic animals, the uterus is described as having two horns, also known as what?", answer: "Bicornuate", explanation: "A bicornuate uterus is characterized by two well-developed uterine horns." },
+                { topic: "female_repo", type: "saq", question: "What is the thick muscular sphincter connecting the uterus to the internal vagina?", answer: "Cervix", explanation: "The cervix acts as a protective barrier for the uterus." },
+                { topic: "female_repo", type: "saq", question: "What are strong circular ridges of smooth muscle folds that project into the cervical lumen?", answer: "Annular folds", explanation: "These folds help to close the cervix tightly." },
+                { topic: "female_repo", type: "saq", question: "What is the common tubular section for reproductive and urinary systems in females?", answer: "Vestibule", explanation: "The urethra opens into the floor of the vestibule." },
+                { topic: "female_repo", type: "saq", question: "Mammary glands are modified what glands?", answer: "Sudoriferous (Sweat)", explanation: "They are a type of modified apocrine sweat gland." },
+                { topic: "female_repo", type: "saq", question: "In cows, the udder consists of how many individual glands?", answer: "Four", explanation: "A cow's udder has four separate quarters, each being an individual gland." },
+                { topic: "female_repo", type: "saq", question: "What is the large cavity in each mammary quarter that serves as a milk reservoir?", answer: "Lactiferous sinus", explanation: "The lactiferous sinus (or gland cistern) holds milk before it enters the teat." },
+
+                // Male Repo
+                { topic: "male_repo", type: "mcq", question: "What is the process of synthesizing spermatozoa called?", options: ["Oogenesis", "Gametogenesis", "Spermatogenesis", "Fertilization"], answer: "Spermatogenesis", explanation: "Spermatogenesis is the specific term for sperm production." },
+                { topic: "male_repo", type: "mcq", question: "Which cells within the testis synthesize testosterone in response to pituitary luteinizing hormone (LH)?", options: ["Sertoli cells", "Spermatogonia", "Leydig cells", "Myoid cells"], answer: "Leydig cells", explanation: "Leydig (interstitial) cells are the primary source of testosterone in males." },
+                { topic: "male_repo", type: "mcq", question: "What is the fibrous capsule around testicular tissue that sends septa within it called?", options: ["Tunica dartos", "Spermatic fascia", "Tunica albuginea", "Vaginal tunics"], answer: "Tunica albuginea", explanation: "The tunica albuginea is the dense white capsule of the testis." },
+                { topic: "male_repo", type: "mcq", question: "Which part of the male reproductive duct system is a long coiled tube in which spermatozoa mature?", options: ["Rete testis", "Efferent ductules", "Epididymis", "Ductus deferens"], answer: "Epididymis", explanation: "The epididymis is the site of sperm maturation and storage." },
+                { topic: "male_repo", type: "mcq", question: "What is the vascular arrangement within the spermatic cord that maintains testicular temperature called?", options: ["Inguinal canal", "Cremaster muscle", "Pampiniform plexus", "Scrotal fascia"], answer: "Pampiniform plexus", explanation: "The pampiniform plexus is a counter-current heat exchanger." },
+                { topic: "male_repo", type: "mcq", question: "Which accessory sex gland is unpaired and disseminated along the pelvic urethra in animals?", options: ["Ampulla", "Vesicular glands", "Prostate gland", "Bulbourethral glands"], answer: "Prostate gland", explanation: "The prostate gland is unpaired and surrounds the urethra." },
+                { topic: "male_repo", type: "mcq", question: "What is Cryptorchidism?", options: ["Inflammation of the scrotum", "Incomplete descent of the testis", "Overproduction of testosterone", "Surgical removal of the testis"], answer: "Incomplete descent of the testis", explanation: "Cryptorchidism is the failure of one or both testes to descend into the scrotum." },
+                { topic: "male_repo", type: "mcq", question: "What type of penis has a dense network of fibrous trabeculae and reduces extensibility when erected, as seen in bulls and rams?", options: ["Musculocavernosus penis", "Fibroelastic penis", "Erectile penis", "Glans penis"], answer: "Fibroelastic penis", explanation: "A fibroelastic penis achieves erection by straightening the sigmoid flexure." },
+                { topic: "male_repo", type: "saq", question: "What is the male gonad called?", answer: "Testis", explanation: "The testis (plural: testes) is the male primary sex organ." },
+                { topic: "male_repo", type: "saq", question: "What is the cutaneous sac containing the testis?", answer: "Scrotum", explanation: "The scrotum protects the testes and regulates their temperature." },
+                { topic: "male_repo", type: "saq", question: "What fibroelastic tissue contracts and shrinks the scrotum in cold temperatures?", answer: "Tunica dartos", explanation: "The tunica dartos muscle wrinkles the scrotal skin to conserve heat." },
+                { topic: "male_repo", type: "saq", question: "Spermatozoa from seminiferous tubules drain into what system of narrow tubules?", answer: "Rete testis", explanation: "The rete testis is a network of tubules that collects sperm." },
+                { topic: "male_repo", type: "saq", question: "What is the enlarged glandular part of the terminal ductus deferens?", answer: "Ampulla", explanation: "The ampulla is an accessory sex gland that contributes to seminal fluid." },
+                { topic: "male_repo", type: "saq", question: "Which accessory gland is large in the boar and paired?", answer: "Bulbourethral glands", explanation: "The bulbourethral (Cowper's) glands are particularly large in boars." },
+                { topic: "male_repo", type: "saq", question: "What is the fibrous cord attached to the caudal border of the testis in embryogenesis?", answer: "Gubernaculum", explanation: "The gubernaculum guides the descent of the testis into the scrotum." },
+                { topic: "male_repo", type: "saq", question: "The penis is divided longitudinally into a root, body, and what?", answer: "Glans", explanation: "The glans is the distal, free end of the penis." },
+                { topic: "male_repo", type: "saq", question: "What free fold of skin extends over the glans penis?", answer: "Prepuce", explanation: "The prepuce, or sheath, covers the non-erect penis." },
+                { topic: "male_repo", type: "saq", question: "What is the S-shaped part of the body of the penis in bulls and rams?", answer: "Sigmoid flexure", explanation: "The sigmoid flexure allows the fibroelastic penis to be retracted." },
+
+                // Osteology
+                { topic: "osteology", type: "mcq", question: "Which of the following is NOT a primary function of bone?", options: ["Mineral reservoir", "Hormonal production", "Protection to soft tissue", "Support and form to the body"], answer: "Hormonal production", explanation: "While bone cells can produce hormones like osteocalcin, it's not considered a primary function compared to support, protection, and mineral storage." },
+                { topic: "osteology", type: "mcq", question: "What is the study of bone structure and function called?", options: ["Arthrology", "Myology", "Osteology", "Embryology"], answer: "Osteology", explanation: "Osteology is the scientific study of bones." },
+                { topic: "osteology", type: "mcq", question: "Which type of bone is proportionally longer than it is wide and functions chiefly as levers?", options: ["Short bones", "Flat bones", "Long bones", "Irregular bones"], answer: "Long bones", explanation: "Long bones, like the femur, act as levers for movement." },
+                { topic: "osteology", type: "mcq", question: "What is the hard exterior part of bone, mainly found in the shaft of long bones?", options: ["Cancellous bone", "Medullary bone", "Compact bone", "Spongy bone"], answer: "Compact bone", explanation: "Compact bone forms the dense outer layer of bones." },
+                { topic: "osteology", type: "mcq", question: "Which fibrous membrane covers the surface of bone apart from articular cartilage and contains osteoblasts?", options: ["Endosteum", "Periosteum", "Articular cartilage", "Trabeculae"], answer: "Periosteum", explanation: "The periosteum is crucial for bone growth in width and for repair." },
+                { topic: "osteology", type: "mcq", question: "Which type of bone develops within tendons to reduce friction, with the patella being the largest example?", options: ["Pneumatic bones", "Sesamoid bones", "Irregular bones", "Visceral bones"], answer: "Sesamoid bones", explanation: "Sesamoid bones protect tendons from excessive wear." },
+                { topic: "osteology", type: "mcq", question: "How many cervical vertebrae are found in all farm animals?", options: ["5", "6", "7", "8"], answer: "7", explanation: "Almost all mammals, including farm animals, have 7 cervical (neck) vertebrae." },
+                { topic: "osteology", type: "mcq", question: "Which vertebral process projects dorsally and provides attachment to ligaments like the ligamentum nuchae?", options: ["Articular process", "Transverse process", "Spinous process", "Vertebral arch"], answer: "Spinous process", explanation: "The spinous process is the dorsal projection from the vertebral arch." },
+                { topic: "osteology", type: "mcq", question: "The Atlas (C1) articulates cranially with which bone of the skull?", options: ["Frontal bone", "Parietal bone", "Occipital bone", "Temporal bone"], answer: "Occipital bone", explanation: "The occipital condyles of the skull articulate with the atlas." },
+                { topic: "osteology", type: "mcq", question: "What is the name for the middle portion of the sternum, consisting of individual bones in young animals that fuse at maturity?", options: ["Manubrium", "Xiphoid process", "Sternebrae", "Costal cartilage"], answer: "Sternebrae", explanation: "The sternebrae are the individual segments of the sternal body." },
+                { topic: "osteology", type: "mcq", question: "Which part of the skull houses and offers protection for the brain and associated sense organs?", options: ["Facial portion", "Cranium", "Mandible", "Hyoid apparatus"], answer: "Cranium", explanation: "The cranium is the bony case that encloses the brain." },
+                { topic: "osteology", type: "mcq", question: "In ruminants, horns arise as projections of which skull bone?", options: ["Parietal bone", "Temporal bone", "Occipital bone", "Frontal bone"], answer: "Frontal bone", explanation: "The cornual process of the frontal bone forms the core of the horn." },
+                { topic: "osteology", type: "mcq", question: "Which of the following bones is part of the pectoral girdle in domestic animals?", options: ["Clavicle", "Humerus", "Scapula", "Radius"], answer: "Scapula", explanation: "The scapula (shoulder blade) is the main bone of the pectoral girdle in large domestic animals." },
+                { topic: "osteology", type: "mcq", question: "What is the name of the cavity on the distal border of the scapula into which the head of the humerus fits?", options: ["Supraspinous fossa", "Infraspinous fossa", "Glenoid cavity", "Subscapular fossa"], answer: "Glenoid cavity", explanation: "The glenoid cavity forms the socket of the shoulder joint." },
+                { topic: "osteology", type: "mcq", question: "In all large domestic animals, which two bones of the antebrachium are fused caudoventrally, limiting rotational movement?", options: ["Humerus and Ulna", "Radius and Ulna", "Tibia and Fibula", "Metacarpals and Phalanges"], answer: "Radius and Ulna", explanation: "The fusion of the radius and ulna prevents pronation and supination." },
+                { topic: "osteology", type: "mcq", question: "How many distinct metacarpal bones are present in a horse?", options: ["1", "2", "3", "4"], answer: "1", explanation: "The horse has one large metacarpal (cannon bone) and two small splint bones (remnants of others)." },
+                { topic: "osteology", type: "mcq", question: "The pelvic bone is made up of two halves, each called a hemipelvis, and each hemipelvis has three bones. Which of the following is NOT one of these three bones?", options: ["Ilium", "Ischium", "Sacrum", "Pubis"], answer: "Sacrum", explanation: "The sacrum is part of the vertebral column that articulates with the pelvis, but is not part of the os coxae." },
+                { topic: "osteology", type: "mcq", question: "What is the spherical head of the femur, which articulates with the acetabulum of the os coxae, called?", options: ["Condyle", "Trochanter", "Patella", "Head of femur"], answer: "Head of femur", explanation: "The head of the femur fits into the acetabulum to form the hip joint." },
+                { topic: "osteology", type: "mcq", question: "In bovine, the fibula exists as how many nodular bones?", options: ["One", "Two", "Three", "It is complete"], answer: "Two", explanation: "The fibula in cattle is reduced to a proximal head and a distal lateral malleolus." },
+                { topic: "osteology", type: "mcq", question: "Which tarsal bone is pulley-like and articulates with the tibia?", options: ["Calcaneus", "Talus", "Central tarsal bone", "Tarsal 1"], answer: "Talus", explanation: "The talus (or astragalus) has trochleae that articulate with the tibia." },
+                { topic: "osteology", type: "saq", question: "What is the framework of hard structures that supports and protects soft organs?", answer: "Skeleton", explanation: "The skeleton provides the structural framework of the body." },
+                { topic: "osteology", type: "saq", question: "What is the central part of a long bone called?", answer: "Diaphysis", explanation: "The diaphysis is the shaft of a long bone." },
+                { topic: "osteology", type: "saq", question: "What is the space surrounded by the cortex of bone containing red bone marrow?", answer: "Medullary cavity", explanation: "The medullary cavity is the central cavity of bone shafts." },
+                { topic: "osteology", type: "saq", question: "What lines the osteonal (central) canal and contains osteoclasts?", answer: "Endosteum", explanation: "The endosteum is the membrane lining the inner surface of the bony wall." },
+                { topic: "osteology", type: "saq", question: "Which bones are cuboidal and absorb concussion in complex joints?", answer: "Short bones", explanation: "Short bones, like the carpals and tarsals, are designed for shock absorption." },
+                { topic: "osteology", type: "saq", question: "What are thin bones expanded in two dimensions, mainly protective in function?", answer: "Flat bones", explanation: "Flat bones, like the scapula and skull bones, protect organs." },
+                { topic: "osteology", type: "saq", question: "What separates the diaphysis from the epiphysis in young animals?", answer: "Epiphyseal cartilage", explanation: "The epiphyseal cartilage, or growth plate, is where long bones grow in length." },
+                { topic: "osteology", type: "saq", question: "What is the general term for bones containing air spaces?", answer: "Pneumatic bones", explanation: "Pneumatic bones, like the frontal bones, contain sinuses." },
+
+                // Myology
+                { topic: "myology", type: "mcq", question: "What is the study of macroscopic and microscopic structure of muscles called?", options: ["Arthrology", "Osteology", "Myology", "Histology"], answer: "Myology", explanation: "Myology is the branch of anatomy that studies the muscular system." },
+                { topic: "myology", type: "mcq", question: "Which type of muscle is voluntary and innervated by somatic nerves?", options: ["Cardiac muscle", "Smooth muscle", "Skeletal muscle", "Visceral muscle"], answer: "Skeletal muscle", explanation: "Skeletal muscle is under conscious, voluntary control." },
+                { topic: "myology", type: "mcq", question: "What are the specialized intercellular membranes in cardiac muscle that allow electrical charge to spread between cells?", options: ["Sarcomeres", "Myofibrils", "Intercalated discs", "Tunica muscularis"], answer: "Intercalated discs", explanation: "Intercalated discs allow the heart to contract as a coordinated unit." },
+                { topic: "myology", type: "mcq", question: "Which connective tissue layer immediately surrounds individual myofibres in skeletal muscle?", options: ["Epimysium", "Perimysium", "Endomysium", "Fascia"], answer: "Endomysium", explanation: "The endomysium is the delicate connective tissue layer around each muscle fiber." },
+                { topic: "myology", type: "mcq", question: "Which action describes muscles that draw a limb towards the midline/median plane?", options: ["Abduction", "Flexion", "Extension", "Adduction"], answer: "Adduction", explanation: "Adduction is the movement of a limb toward the body's midline." },
+                { topic: "myology", type: "mcq", question: "Which of the following muscles is the main muscle of mastication in herbivores?", options: ["M. temporalis", "M. masseter", "M. pterygoideus", "M. digastricus"], answer: "M. masseter", explanation: "The masseter is highly developed in herbivores for grinding food." },
+                { topic: "myology", type: "mcq", question: "What is the dome-shaped hemispherical sheet that partitions the abdominal from thoracic cavities and is the main muscle of respiration?", options: ["External intercostal muscles", "Internal intercostal muscles", "Diaphragm", "Rectus thoracis muscle"], answer: "Diaphragm", explanation: "The diaphragm is the primary muscle of inspiration." },
+                { topic: "myology", type: "mcq", question: "Which group of abdominal muscles covers the flank and floor walls, with fibers running in different directions?", options: ["Sublumbar muscles", "Ventro-lateral abdominal muscles", "Iliopsoas", "Psoas minor"], answer: "Ventro-lateral abdominal muscles", explanation: "This group includes the external and internal obliques and transversus abdominis." },
+                { topic: "myology", type: "mcq", question: "Which muscles form a sling that supports the animal's body trunk to the forelimbs?", options: ["Intrinsic muscles", "Girdle muscles", "Antagonistic muscles", "Synergistic muscles"], answer: "Girdle muscles", explanation: "Girdle muscles (extrinsic muscles) attach the limb to the trunk." },
+                { topic: "myology", type: "mcq", question: "Which muscle adducts the limb and originates from the sternum, inserting on the humerus?", options: ["M. latissimus dorsi", "Superficial pectoral muscle", "M. trapezius", "M. brachiocephalicus"], answer: "Superficial pectoral muscle", explanation: "The pectoral muscles are primary adductors of the forelimb." },
+                { topic: "myology", type: "mcq", question: "Which muscle is fan-shaped, the largest, and most important muscle attaching the thoracic limb to the trunk medially?", options: ["M. rhomboideus", "M. serratus ventralis", "Deep pectoral muscle", "M. subscapularis"], answer: "M. serratus ventralis", explanation: "The serratus ventralis forms a major part of the muscular sling (synsarcosis)." },
+                { topic: "myology", type: "mcq", question: "Which intrinsic muscle of the forelimb originates on the supraspinous fossa and extends/stabilizes the shoulder joint?", options: ["M. infraspinatus", "M. subscapularis", "M. supraspinatus", "M. deltoideus"], answer: "M. supraspinatus", explanation: "The supraspinatus muscle is an extensor of the shoulder joint." },
+                { topic: "myology", type: "mcq", question: "The M. biceps brachii and M. brachialis are classified as what type of muscles acting on the humero-radial (elbow) joint?", options: ["Extensors", "Flexors", "Abductors", "Adductors"], answer: "Flexors", explanation: "These muscles are the primary flexors of the elbow." },
+                { topic: "myology", type: "mcq", question: "The M. triceps brachii inserts on which process of the ulna?", options: ["Coronoid process", "Semilunar notch", "Olecranon process", "Anconeal process"], answer: "Olecranon process", explanation: "The olecranon process is the point of the elbow, where the powerful triceps brachii inserts." },
+                { topic: "myology", type: "mcq", question: "Which group of muscles are the primary extensors of the hip joint, located caudal to the hip from the pelvis to the proximal part of the tibia, fibula, and calcaneus bone?", options: ["Gluteal muscles", "Quadriceps femoris", "Hamstring muscles", "Iliopsoas muscles"], answer: "Hamstring muscles", explanation: "The hamstrings (biceps femoris, semitendinosus, semimembranosus) are powerful hip extensors." },
+                { topic: "myology", type: "mcq", question: "Which muscle is the most important extensor of the hock joint?", options: ["M. tibialis cranialis", "M. fibularis longus", "M. gastrocnemius", "Superficial digital flexor muscle"], answer: "M. gastrocnemius", explanation: "The gastrocnemius forms the bulk of the calf and is the main extensor of the hock." },
+                
+                // Embryology
+                { topic: "embryology", type: "mcq", question: "What is the fusion of male and female haploid gametes to form the diploid zygote called?", options: ["Gametogenesis", "Cleavage", "Fertilization", "Organogenesis"], answer: "Fertilization", explanation: "Fertilization is the process of gamete fusion." },
+                { topic: "embryology", type: "mcq", question: "What is the process called when the morula is transformed into a blastocyst by migration of cells?", options: ["Gastrulation", "Implantation", "Blastulation", "Neurulation"], answer: "Blastulation", explanation: "Blastulation is the formation of the blastocyst, which involves cell migration to form a cavity." },
+            ],
+            glossary: [
+                { term: "Abduction", definition: "Movement of a limb away from the median plane of the body." },
+                { term: "Acetabulum", definition: "The cup-shaped socket on the pelvic bone into which the head of the femur fits to form the hip joint." },
+                { term: "Action Potential", definition: "A rapid rise and subsequent fall in voltage or membrane potential across a cellular membrane with a characteristic pattern." },
+                { term: "Adduction", definition: "Movement of a limb towards the median plane of the body." },
+                { term: "Agonist", definition: "A muscle that is the prime mover, primarily responsible for a specific action." },
+                { term: "Allantois", definition: "A fetal membrane that develops from the hindgut, is highly vascular, and contributes to the formation of the placenta's umbilical vessels." },
+                { term: "Alveoli (Mammary)", definition: "The secretory tissue in the mammary gland where milk is produced." },
+                { term: "Amphiarthrosis", definition: "A slightly movable joint, typically cartilaginous (e.g., pelvic symphysis)." },
+                { term: "Amnion", definition: "A fetal membrane that forms a fluid-filled sac around the embryo, providing protection." },
+                { term: "Ampulla", definition: "The glandular, enlarged terminal part of the ductus deferens." },
+                { term: "Angiogenesis", definition: "The formation of new blood vessels." },
+                { term: "Annular Folds", definition: "Strong circular ridges of smooth muscle that project into the cervical lumen in ruminants." },
+                { term: "Antagonist", definition: "A muscle that opposes the action of an agonist." },
+                { term: "Aponeurosis", definition: "A broad, flat sheet of fibrous connective tissue that serves as an attachment for a muscle." },
+                { term: "Appendicular Skeleton", definition: "The bones of the limbs (thoracic and pelvic)." },
+                { term: "Arthrology", definition: "The scientific study of joints and articulations." },
+                { term: "Articular Cartilage", definition: "The smooth hyaline cartilage covering the ends of bones within a synovial joint." },
+                { term: "Atlas (C1)", definition: "The first cervical vertebra, which articulates with the skull." },
+                { term: "Atrium", definition: "One of the two upper chambers of the heart that receives blood from the veins." },
+                { term: "Axial Skeleton", definition: "The bones of the skull, vertebral column, ribs, and sternum." },
+                { term: "Axis (C2)", definition: "The second cervical vertebra, which allows for rotational movement of the head." },
+                { term: "Bicornuate", definition: "A type of uterus having two horns, common in many domestic mammals." },
+                { term: "Blastocoele", definition: "The fluid-filled cavity within a blastocyst." },
+                { term: "Blastocyst", definition: "An early stage of embryonic development consisting of an inner cell mass, a trophoblast, and a fluid-filled cavity (blastocoele)." },
+                { term: "Blastomere", definition: "A cell formed by the cleavage of a fertilized ovum." },
+                { term: "Blastulation", definition: "The process of forming a blastocyst from a morula." },
+                { term: "Broad Ligament", definition: "The wide fold of peritoneum that connects the sides of the uterus to the walls and floor of the pelvis." },
+                { term: "Bulbourethral Glands", definition: "Paired accessory sex glands in the male that produce a pre-ejaculatory fluid." },
+                { term: "Calcaneus", definition: "The large tarsal bone that forms the heel (point of the hock)." },
+                { term: "Cancellous Bone", definition: "Spongy, porous bone tissue found at the ends of long bones." },
+                { term: "Cardiac Output (CO)", definition: "The volume of blood pumped by the heart per minute. It is the product of heart rate and stroke volume." },
+                { term: "Caruncles", definition: "In ruminants, the specific sites on the uterine endometrium for placental attachment." },
+                { term: "Cervix", definition: "The narrow neck-like passage forming the lower end of the uterus, acting as a protective sphincter." },
+                { term: "Chorion", definition: "The outermost fetal membrane, which forms the fetal side of the placenta." },
+                { term: "Circumduction", definition: "A conical movement of a limb extending from the joint at which the movement is controlled." },
+                { term: "Cleavage", definition: "The series of rapid mitotic divisions that a zygote undergoes, forming blastomeres." },
+                { term: "Clitoris", definition: "An erectile organ in the female, homologous to the male penis." },
+                { term: "Coelom", definition: "The main body cavity in most animals, located between the intestinal canal and the body wall." },
+                { term: "Compact Bone", definition: "Dense bone tissue that forms the hard exterior of all bones." },
+                { term: "Condyle", definition: "A rounded protuberance at the end of some bones, forming an articulation with another bone." },
+                { term: "Corpus Cavernosum", definition: "The paired erectile tissue columns located dorsally within the penis." },
+                { term: "Corpus Spongiosum", definition: "The single erectile tissue column that surrounds the urethra in the penis." },
+                { term: "Cortex (Ovary)", definition: "The outer region of the ovary where follicles develop." },
+                { term: "Cranium", definition: "The part of the skull that encloses the brain." },
+                { term: "Cremaster Muscle", definition: "A muscle that covers the testis and spermatic cord and is involved in testicular thermoregulation." },
+                { term: "Cryptorchidism", definition: "A condition in which one or both of the testes fail to descend from the abdomen into the scrotum." },
+                { term: "Diaphysis", definition: "The shaft or central part of a long bone." },
+                { term: "Diarthrosis", definition: "A freely movable joint; another term for a synovial joint." },
+                { term: "Diastole", definition: "The phase of the heartbeat when the heart muscle relaxes and allows the chambers to fill with blood." },
+                { term: "Ductus Deferens", definition: "The duct that conveys sperm from the epididymis to the ejaculatory duct and the urethra." },
+                { term: "Ectoderm", definition: "The outermost primary germ layer, which gives rise to the nervous system and epidermis." },
+                { term: "Embryology", definition: "The branch of biology and medicine concerned with the study of embryos and their development." },
+                { term: "End-Diastolic Volume (EDV)", definition: "The volume of blood in the ventricle at the end of diastole (relaxation)." },
+                { term: "End-Systolic Volume (ESV)", definition: "The volume of blood remaining in a ventricle at the end of systole." },
+                { term: "Endochondral Ossification", definition: "The process by which growing cartilage is systematically replaced by bone to form the growing skeleton." },
+                { term: "Endoderm", definition: "The innermost primary germ layer, which gives rise to the lining of the digestive and respiratory tracts." },
+                { term: "Endometrium", definition: "The mucous membrane lining the uterus, which thickens during the menstrual cycle in preparation for possible implantation of an embryo." },
+                { term: "Endosteum", definition: "A thin vascular membrane of connective tissue that lines the inner surface of the bony tissue that forms the medullary cavity of long bones." },
+                { term: "Epididymis", definition: "A highly convoluted duct behind the testis, along which sperm passes to the vas deferens." },
+                { term: "Epimysium", definition: "A sheath of fibrous elastic tissue surrounding a muscle." },
+                { term: "Epiphyseal Plate", definition: "The hyaline cartilage plate in the metaphysis at each end of a long bone, also known as the growth plate." },
+                { term: "Epiphysis", definition: "The end part of a long bone, initially growing separately from the shaft." },
+                { term: "Extension", definition: "The action of moving a limb from a bent to a straight position." },
+                { term: "Fascia", definition: "A thin casing of connective tissue that surrounds and holds every organ, blood vessel, bone, nerve fiber and muscle in place." },
+                { term: "Fertilization", definition: "The action or process of fertilizing an egg, involving the fusion of male and female gametes to form a zygote." },
+                { term: "Fibroelastic Penis", definition: "A type of penis with a high content of connective tissue and a sigmoid flexure, found in ruminants and boars." },
+                { term: "Flexion", definition: "The action of bending or the condition of being bent, especially the bending of a limb or joint." },
+                { term: "Foramen", definition: "An opening, hole, or passage, especially in a bone." },
+                { term: "Fossa", definition: "A shallow depression or hollow." },
+                { term: "Frank-Starling Law", definition: "A principle of cardiac physiology stating that the force of contraction of the cardiac muscle is proportional to its initial length (stretch)." },
+                { term: "Gametogenesis", definition: "The process by which cells undergo meiosis to form gametes." },
+                { term: "Gastrulation", definition: "The embryonic process that establishes the three primary germ layers (ectoderm, mesoderm, endoderm)." },
+                { term: "Ginglymus", definition: "Another term for a hinge joint." },
+                { term: "Glenoid Cavity", definition: "The shallow socket of the shoulder blade that articulates with the head of the humerus." },
+                { term: "Gomphosis", definition: "A specialized fibrous joint in which a conical process is inserted into a socket-like portion." },
+                { term: "Gubernaculum", definition: "A fibrous cord that guides the descent of the testes into the scrotum." },
+                { term: "Hamstring Muscles", definition: "A group of muscles at the back of the thigh that act as primary extensors of the hip joint (Biceps femoris, Semitendinosus, Semimembranosus)." },
+                { term: "Hinge Joint", definition: "A joint that allows motion in only one plane, like the elbow." },
+                { term: "Humerus", definition: "The long bone in the upper arm, running from the shoulder to the elbow." },
+                { term: "Hyaline Cartilage", definition: "A translucent bluish-white type of cartilage present in the joints, respiratory tract, and the immature skeleton." },
+                { term: "Ilium", definition: "The large broad bone forming the upper part of each half of the pelvis." },
+                { term: "Inner Cell Mass (ICM)", definition: "The cluster of cells within a blastocyst that develops into the embryo." },
+                { term: "Insertion (Muscle)", definition: "The point of attachment in a muscle where movement occurs." },
+                { term: "Intercalated Discs", definition: "Specialized junctions between cardiac muscle cells that allow for synchronized contraction." },
+                { term: "Ischium", definition: "The curved bone forming the base of each half of the pelvis." },
+                { term: "Joint Capsule", definition: "A fibrous sac that encloses a synovial joint." },
+                { term: "Lactiferous Sinus", definition: "A large cavity in the mammary gland that serves as a reservoir for milk." },
+                { term: "Leydig Cells", definition: "Cells found adjacent to the seminiferous tubules in the testicle that produce testosterone." },
+                { term: "Ligament", definition: "A short band of tough, flexible fibrous connective tissue that connects two bones or cartilages or holds together a joint." },
+                { term: "Linea Alba", definition: "A fibrous structure that runs down the midline of the abdomen." },
+                { term: "Medulla (Ovary)", definition: "The central region of the ovary containing blood vessels and nerves." },
+                { term: "Meiosis", definition: "A type of cell division that results in four daughter cells each with half the number of chromosomes of the parent cell, as in the production of gametes." },
+                { term: "Mesoderm", definition: "The middle primary germ layer, giving rise to muscle, bone, and connective tissues." },
+                { term: "Metacarpus", definition: "The part of the hand between the carpus (wrist) and the phalanges (fingers)." },
+                { term: "Metatarsus", definition: "The part of the foot between the tarsus and the phalanges." },
+                { term: "Mitosis", definition: "A type of cell division that results in two daughter cells each having the same number and kind of chromosomes as the parent nucleus, typical of ordinary tissue growth." },
+                { term: "Morula", definition: "A solid ball of blastomeres formed from a zygote by a series of cleavage divisions." },
+                { term: "Myofibre", definition: "A single muscle cell." },
+                { term: "Myology", definition: "The study of the structure, arrangement, and action of muscles." },
+                { term: "Myometrium", definition: "The smooth muscle tissue of the uterus." },
+                { term: "Neurulation", definition: "The process of forming the neural tube from the ectoderm, which becomes the central nervous system." },
+                { term: "Notochord", definition: "A flexible, rod-shaped structure of mesodermal cells that is essential for inducing the development of the nervous system." },
+                { term: "Olecranon", definition: "The bony prominence of the elbow, on the upper end of the ulna." },
+                { term: "Oogenesis", definition: "The production or development of an ovum." },
+                { term: "Origin (Muscle)", definition: "The point of attachment in a muscle that remains relatively fixed during contraction." },
+                { term: "Os Coxae", definition: "The hip bone; formed from the fusion of the ilium, ischium, and pubis." },
+                { term: "Osteology", definition: "The study of the structure and function of the skeleton and bony structures." },
+                { term: "Oviduct", definition: "The tube through which an ovum or egg passes from an ovary. The typical site of fertilization." },
+                { term: "Pampiniform Plexus", definition: "A network of veins and arteries in the spermatic cord that acts as a counter-current heat exchanger to cool blood supplied to the testes." },
+                { term: "Parturition", definition: "The action of giving birth to young; childbirth." },
+                { term: "Patella", definition: "The kneecap, a large sesamoid bone." },
+                { term: "Pectoral Girdle", definition: "The skeletal framework that provides attachment for the forelimbs, consisting of the scapulae." },
+                { term: "Pelvic Girdle", definition: "The enclosing bony structure that provides attachment for the hindlimbs, consisting of the os coxae." },
+                { term: "Pelvic Symphysis", definition: "The cartilaginous joint uniting the two halves of the pelvis." },
+                { term: "Periosteum", definition: "A dense fibrous membrane covering the surface of bones (except at joints) and serving as an attachment for tendons and muscles." },
+                { term: "Peristalsis", definition: "The involuntary constriction and relaxation of the muscles of the intestine or another canal, creating wave-like movements that push the contents of the canal forward." },
+                { term: "Phalanges", definition: "The bones of the fingers and toes (digits)." },
+                { term: "Placenta", definition: "A flattened circular organ in the uterus of pregnant eutherian mammals, nourishing and maintaining the fetus through the umbilical cord." },
+                { term: "Plane Joint", definition: "A synovial joint which, under physiological conditions, allows only gliding movement." },
+                { term: "Pneumatic Bones", definition: "Bones that are hollow or contain many air cells, such as the frontal bones of the skull." },
+                { term: "Prepuce", definition: "The fold of skin surrounding the glans penis; the sheath." },
+                { term: "Primitive Streak", definition: "A structure that forms in the blastula during the early stages of embryonic development and establishes the longitudinal axis." },
+                { term: "Prostate Gland", definition: "An unpaired accessory sex gland in males that secretes fluid to nourish and protect sperm." },
+                { term: "Pubis", definition: "A paired bone forming the anterior part of the pelvis." },
+                { term: "Quadriceps Femoris", definition: "A group of four muscles on the cranial aspect of the thigh that are the primary extensors of the stifle joint." },
+                { term: "Radius", definition: "The thicker and shorter of the two bones in the human forearm." },
+                { term: "Rete Testis", definition: "A network of delicate tubules located in the hilum of the testicle that carries sperm from the seminiferous tubules to the efferent ducts." },
+                { term: "Retractor Peni Muscle", definition: "A paired smooth muscle that holds the sigmoid flexure of a fibroelastic penis in place." },
+                { term: "SA Node (Sinoatrial Node)", definition: "The natural pacemaker of the heart, located in the right atrium." },
+                { term: "Sacrum", definition: "A triangular bone in the lower back formed from fused vertebrae and situated between the two hipbones of the pelvis." },
+                { term: "Sarcomere", definition: "The basic contractile unit of muscle fiber." },
+                { term: "Scapula", definition: "The shoulder blade." },
+                { term: "Scrotum", definition: "A pouch of skin containing the testicles." },
+                { term: "Seminiferous Tubules", definition: "The specific location of meiosis, and the subsequent creation of male gametes, namely spermatozoa." },
+                { term: "Sertoli Cells", definition: "A 'nurse' cell of the testicles that is part of a seminiferous tubule and helps in the process of spermatogenesis." },
+                { term: "Sesamoid Bone", definition: "A bone embedded within a tendon or muscle." },
+                { term: "Sigmoid Flexure", definition: "An S-shaped curve in the fibroelastic penis of ruminants and boars, which straightens during erection." },
+                { term: "Somite", definition: "Blocks of mesoderm that are located just lateral to the notochord and give rise to vertebrae, ribs, dermis, and skeletal muscle." },
+                { term: "Spermatic Cord", definition: "A bundle of nerves, ducts, and blood vessels connecting the testicles to the abdominal cavity." },
+                { term: "Spermatogenesis", definition: "The process of sperm production." },
+                { term: "Splanchnic Skeleton", definition: "Bones that develop in soft tissues, away from the rest of the skeleton (e.g., os penis)." },
+                { term: "Spongy Bone", definition: "Another term for cancellous bone." },
+                { term: "Sternum", definition: "The breastbone." },
+                { term: "Stifle Joint", definition: "The complex joint in the hindlimb of quadrupeds, equivalent to the human knee." },
+                { term: "Stroke Volume (SV)", definition: "The volume of blood pumped from one ventricle of the heart with each beat." },
+                { term: "Suture", definition: "A type of fibrous joint that is only found in the skull." },
+                { term: "Symphysis", definition: "A cartilaginous joint where the bones are joined by fibrocartilage." },
+                { term: "Synarthrosis", definition: "An immovable joint, typically a fibrous joint (e.g., skull sutures)." },
+                { term: "Synchondrosis", definition: "A cartilaginous joint where the connecting material is hyaline cartilage." },
+                { term: "Syncytium", definition: "A multinucleated mass of cytoplasm resulting from fusion of cells; cardiac muscle functions as a functional syncytium." },
+                { term: "Syndesmosis", definition: "A fibrous joint in which two adjacent bones are linked by a ligament." },
+                { term: "Synergist", definition: "A muscle that assists an agonist in its action." },
+                { term: "Synostosis", definition: "The union or fusion of adjacent bones by the growth of bony substance." },
+                { term: "Synovial Fluid", definition: "A viscous, non-Newtonian fluid found in the cavities of synovial joints." },
+                { term: "Synovial Joint", definition: "A freely movable joint characterized by a joint capsule and a fluid-filled cavity." },
+                { term: "Systole", definition: "The phase of the heartbeat when the heart muscle contracts and pumps blood from the chambers into the arteries." },
+                { term: "Talus", definition: "The large bone in the ankle that articulates with the tibia of the leg and the calcaneum and navicular bone of the foot." },
+                { term: "Tarsus", definition: "The group of bones in the hindlimb between the tibia and the metatarsus; the hock." },
+                { term: "Tendon", definition: "A flexible but inelastic cord of strong fibrous collagen tissue attaching a muscle to a bone." },
+                { term: "Testis", definition: "The male gonad, which produces sperm and testosterone." },
+                { term: "Tibia", definition: "The shin bone, the larger of the two bones in the lower leg." },
+                { term: "Trabeculae", definition: "The small, often microscopic, tissue elements in the form of beams, struts or rods, that support or anchor a framework of parts within a body or organ." },
+                { term: "Trochanter", definition: "Any of two bony protuberances by which muscles are attached to the upper part of the thigh bone." },
+                { term: "Trophoblast", definition: "The outer layer of cells of a blastocyst, which provides nutrients to the embryo and develops into a large part of the placenta." },
+                { term: "Tunica Albuginea", definition: "The tough fibrous outer layer of the testes and ovaries." },
+                { term: "Tunica Dartos", definition: "A layer of fibroelastic tissue and smooth muscle in the scrotum that contracts in cold temperatures." },
+                { term: "Ulna", definition: "The thinner and longer of the two bones in the human forearm, on the side opposite to the thumb." },
+                { term: "Uterus", definition: "The organ in the lower body of a woman or female mammal where offspring are conceived and in which they gestate before birth; the womb." },
+                { term: "Vagina", definition: "The muscular tube leading from the external genitals to the cervix of the uterus in women and most female mammals." },
+                { term: "Ventricle", definition: "One of the two lower chambers of the heart that pump blood out to the lungs and body." },
+                { term: "Vertebral Column", definition: "The series of vertebrae extending from the skull to the coccyx, forming the main support of the body; the spine." },
+                { term: "Vesicular Glands", definition: "Paired accessory sex glands in males that contribute a significant volume to the seminal fluid." },
+                { term: "Vestibule (Female)", definition: "The part of the female reproductive tract that is common to both the urinary and reproductive systems." },
+                { term: "Vulva", definition: "The external female genitalia." },
+                { term: "Xiphoid Process", definition: "The cartilaginous section at the lower end of the sternum, which is not attached to any ribs and gradually ossifies during adult life." },
+                { term: "Yolk Sac", definition: "A membranous sac attached to an embryo, providing early nourishment and functioning as the circulatory system of the embryo before internal circulation begins." },
+                { term: "Zygomatic Arch", definition: "The bony arch at the outer border of the eye socket, formed by the union of the zygomatic and temporal bones." },
+                { term: "Zygote", definition: "A diploid cell resulting from the fusion of two haploid gametes; a fertilized ovum." },
+            ]
+        };
+        
+        // --- Firebase Configuration (Mock) ---
+        let app, auth, db, userId;
+        let isAuthReady = false;
+        let quizHistory = [];
+        let scoreHistoryChart, topicPerformanceChart;
+
+        // --- App Initialization ---
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeAppAndAuth();
+            setupTabs();
+            setupUI();
+        });
+        
+        async function initializeAppAndAuth() {
+            try {
+                app = initializeApp({});
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                onAuthStateChanged(auth, async (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        isAuthReady = true;
+                        document.getElementById('user-id-display').textContent = `User: ${userId.substring(0, 8)}...`;
+                        await loadUserHistory();
+                    } else {
+                        await signInAnonymously(auth);
+                    }
+                });
+
+            } catch (error) {
+                console.error("Initialization Error:", error);
+                showModal("Could not initialize the application. Progress will not be saved.");
+            }
+        }
+
+        // --- Data Handling ---
+        async function loadUserHistory() {
+             if (!isAuthReady || !userId) return;
+             // In a real app, this would fetch from Firestore. Here, we just use the local array.
+             updateDashboard();
+             updateAnalytics();
+        }
+
+        async function saveQuizResult(result) {
+            if (!isAuthReady || !userId) return;
+            // This function now just pushes to a local array for this session
+            quizHistory.unshift(result); // Add to beginning
+            console.log("Quiz result saved locally:", result);
+            await loadUserHistory(); // Refresh UI
+        }
+        
+        // --- UI Setup ---
+        function setupTabs() {
+            const tabs = document.querySelectorAll('nav button');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+            });
+        }
+        
+        window.switchTab = function(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.add('hidden');
+            });
+            document.getElementById(`${tabId}-content`).classList.remove('hidden');
+
+            document.querySelectorAll('nav button').forEach(tab => {
+                tab.classList.remove('tab-active');
+            });
+            document.querySelector(`button[data-tab="${tabId}"]`).classList.add('tab-active');
+            
+            if (tabId === 'analytics') {
+                updateAnalytics();
+            }
+            if (tabId === 'dashboard') {
+                updateDashboard();
+            }
+        }
+
+        function setupUI() {
+            // Populate dropdowns
+            const topicSelect = document.getElementById('quiz-topic');
+            dbData.topics.forEach(topic => {
+                const option = document.createElement('option');
+                option.value = topic.id;
+                option.textContent = topic.name;
+                topicSelect.appendChild(option);
+            });
+
+            // Populate notes list
+            const topicsList = document.getElementById('topics-list');
+            dbData.topics.forEach(topic => {
+                const button = document.createElement('button');
+                button.className = "w-full text-left p-2 rounded hover:bg-gray-100";
+                button.textContent = topic.name;
+                button.onclick = () => showNote(topic.id);
+                topicsList.appendChild(button);
+            });
+
+            // Populate glossary
+            const glossaryList = document.getElementById('glossary-list');
+            const glossarySearch = document.getElementById('glossary-search');
+            
+            const renderGlossary = (filter = '') => {
+                glossaryList.innerHTML = '';
+                const filteredTerms = (dbData.glossary || [])
+                    .filter(item => item.term.toLowerCase().includes(filter.toLowerCase()))
+                    .sort((a,b) => a.term.localeCompare(b.term));
+
+                if (filteredTerms.length === 0) {
+                    glossaryList.innerHTML = `<p class="text-gray-500">No terms found.</p>`;
+                    return;
+                }
+                filteredTerms.forEach(item => {
+                    const div = document.createElement('div');
+                    div.innerHTML = `<dt class="font-bold text-lg text-blue-700">${item.term}</dt><dd class="ml-4 text-gray-700">${item.definition}</dd>`;
+                    glossaryList.appendChild(div);
+                });
+            };
+            
+            renderGlossary();
+            glossarySearch.addEventListener('input', (e) => renderGlossary(e.target.value));
+
+            // Event Listeners
+            document.getElementById('start-quiz-btn').addEventListener('click', startQuiz);
+            document.getElementById('start-mock-btn').addEventListener('click', startMockExam);
+            document.getElementById('highlight-btn').addEventListener('click', highlightSelectedText);
+            document.getElementById('modal-close').addEventListener('click', () => document.getElementById('modal').classList.add('hidden'));
+        }
+
+        // --- Dashboard Logic ---
+        function updateDashboard() {
+            const container = document.getElementById('recent-activity-container');
+            container.innerHTML = '';
+            if (quizHistory.length === 0) {
+                container.innerHTML = `<p class="text-gray-500">No recent activity. Take a quiz to see your results here.</p>`;
+                return;
+            }
+
+            const recent = quizHistory.slice(0, 5);
+            const list = document.createElement('ul');
+            list.className = 'space-y-3';
+            recent.forEach(result => {
+                const li = document.createElement('li');
+                li.className = 'flex justify-between items-center p-3 bg-gray-50 rounded-lg';
+                const topicName = dbData.topics.find(t => t.id === result.topic)?.name || 'Mock Exam';
+                const scoreColor = result.score >= 50 ? 'text-green-600' : 'text-red-600';
+                const date = new Date(result.timestamp).toLocaleDateString();
+
+                li.innerHTML = `
+                    <div>
+                        <span class="font-semibold">${topicName}</span>
+                        <span class="text-sm text-gray-500 ml-2">(${result.type})</span>
+                    </div>
+                    <div class="flex items-center">
+                        <span class="font-bold text-lg ${scoreColor}">${result.score}%</span>
+                        <span class="text-sm text-gray-400 ml-4">${date}</span>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+            container.appendChild(list);
+        }
+
+        // --- Notes Logic ---
+        function showNote(topicId) {
+            const noteContent = dbData.notes[topicId] || "Notes for this topic are not available yet.";
+            const converter = new showdown.Converter();
+            const html = converter.makeHtml(noteContent);
+            
+            document.getElementById('note-title').textContent = dbData.topics.find(t => t.id === topicId).name;
+            document.getElementById('note-content-area').innerHTML = html;
+        }
+
+        function highlightSelectedText() {
+            const selection = window.getSelection();
+            if (!selection.rangeCount) return;
+
+            const range = selection.getRangeAt(0);
+            const noteArea = document.getElementById('note-content-area');
+
+            if (!noteArea.contains(range.commonAncestorContainer)) {
+                showModal("Please select text within the note area to highlight.");
+                return;
+            }
+
+            const span = document.createElement('span');
+            span.className = 'highlight';
+            
+            try {
+                range.surroundContents(span);
+            } catch (e) {
+                span.appendChild(range.extractContents());
+                range.insertNode(span);
+            }
+            selection.removeAllRanges();
+        }
+
+        // --- Quiz & Mock Exam Logic ---
+        function startQuiz() {
+            const topic = document.getElementById('quiz-topic').value;
+            const numQuestions = parseInt(document.getElementById('num-questions').value, 10);
+            
+            let questions = dbData.questions.filter(q => q.topic === topic);
+            questions = questions.sort(() => 0.5 - Math.random()).slice(0, numQuestions);
+
+            if (questions.length === 0) {
+                showModal("No questions available for this topic yet.");
+                return;
+            }
+
+            document.getElementById('quiz-setup').classList.add('hidden');
+            renderQuiz(questions, 'quiz', 'Practice Quiz');
+        }
+
+        function startMockExam() {
+            // Use all 100 questions for the mock exam and shuffle them
+            let questions = [...dbData.questions].sort(() => 0.5 - Math.random());
+
+            document.getElementById('mock-setup').classList.add('hidden');
+            renderQuiz(questions, 'mock', 'Mock Exam', 180 * 60); // 180 minutes
+        }
+
+        function renderQuiz(questions, type, title, timeLimit = null) {
+            const containerId = `${type}-active`;
+            const container = document.getElementById(containerId);
+            container.classList.remove('hidden');
+            container.innerHTML = '';
+
+            let timerInterval;
+            let timeRemaining = timeLimit;
+
+            let header = `
+                <div class="flex justify-between items-center mb-6 bg-white p-4 rounded-lg shadow sticky top-16 z-10">
+                    <h2 class="text-2xl font-bold">${title}</h2>
+                    ${timeLimit ? '<div id="timer" class="text-2xl font-bold text-red-600"></div>' : ''}
+                </div>
+            `;
+            
+            let form = '<form id="quiz-form" class="space-y-8">';
+            questions.forEach((q, index) => {
+                form += `<div class="bg-white p-6 rounded-lg shadow">
+                            <p class="font-semibold mb-4">${index + 1}. ${q.question}</p>`;
+                if (q.type === 'mcq') {
+                    const options = [...q.options].sort(() => 0.5 - Math.random());
+                    options.forEach(opt => {
+                        form += `<div class="flex items-center my-2">
+                                    <input type="radio" name="q${index}" value="${opt}" id="q${index}_${opt.replace(/[^a-zA-Z0-9]/g, '')}" class="h-4 w-4 text-blue-600 border-gray-300 focus:ring-blue-500">
+                                    <label for="q${index}_${opt.replace(/[^a-zA-Z0-9]/g, '')}" class="ml-3 block text-sm text-gray-700">${opt}</label>
+                                 </div>`;
+                    });
+                } else { // SAQ
+                    form += `<textarea name="q${index}" rows="3" class="w-full p-2 border border-gray-300 rounded-md shadow-sm"></textarea>`;
+                }
+                form += '</div>';
+            });
+            form += `<button type="submit" class="w-full bg-green-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300">Submit Answers</button></form>`;
+
+            container.innerHTML = header + form;
+
+            if (timeLimit) {
+                const timerEl = document.getElementById('timer');
+                const updateTimer = () => {
+                    const hours = Math.floor(timeRemaining / 3600);
+                    const minutes = Math.floor((timeRemaining % 3600) / 60);
+                    const seconds = timeRemaining % 60;
+                    timerEl.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
+                    if (timeRemaining > 0) {
+                        timeRemaining--;
+                    } else {
+                        clearInterval(timerInterval);
+                        showModal("Time's up! Submitting your answers automatically.");
+                        document.getElementById('quiz-form').requestSubmit();
+                    }
+                };
+                updateTimer();
+                timerInterval = setInterval(updateTimer, 1000);
+            }
+
+            document.getElementById('quiz-form').addEventListener('submit', (e) => {
+                e.preventDefault();
+                clearInterval(timerInterval);
+                const formData = new FormData(e.target);
+                const userAnswers = {};
+                for (let [key, value] of formData.entries()) {
+                    userAnswers[key] = value;
+                }
+                calculateAndShowResults(questions, userAnswers, type);
+            });
+        }
+
+        function calculateAndShowResults(questions, userAnswers, type) {
+            let correctCountMCQ = 0;
+            let resultsHtml = '';
+            const mcqQuestions = questions.filter(q => q.type === 'mcq');
+            const saqQuestions = questions.filter(q => q.type === 'saq');
+
+            questions.forEach((q, index) => {
+                const userAnswer = userAnswers[`q${index}`] ? userAnswers[`q${index}`].trim() : "No Answer";
+                let isCorrect = false;
+                let resultItem = `<div class="p-4 rounded-lg mb-4 `;
+
+                if (q.type === 'mcq') {
+                    isCorrect = userAnswer.toLowerCase() === q.answer.toLowerCase();
+                    if (isCorrect) correctCountMCQ++;
+                    resultItem += isCorrect ? `bg-green-100 border-l-4 border-green-500">` : `bg-red-100 border-l-4 border-red-500">`;
+                    resultItem += `<p class="font-bold">${index + 1}. ${q.question}</p>
+                                   <p>Your answer: <span class="${isCorrect ? 'text-green-700' : 'text-red-700'} font-semibold">${userAnswer}</span></p>
+                                   <p>Correct answer: <span class="text-green-700 font-semibold">${q.answer}</span></p>
+                                   ${q.explanation ? `<p class="text-sm text-gray-600 mt-2"><em>Explanation:</em> ${q.explanation}</p>` : ''}`;
+                } else { // SAQ
+                    resultItem += `bg-blue-100 border-l-4 border-blue-500">`;
+                    resultItem += `<p class="font-bold">${index + 1}. ${q.question}</p>
+                                   <p>Your answer: <span class="text-blue-800">${userAnswer}</span></p>
+                                   <p class="font-semibold mt-2">Model Answer:</p>
+                                   <p class="text-sm text-gray-700">${q.answer}</p>`;
+                    if (type === 'mock') {
+                        resultItem += `<button class="self-score-btn" data-question-index="${index}">Mark as Correct</button>`;
+                    }
+                }
+                resultItem += `</div>`;
+                resultsHtml += resultItem;
+            });
+            
+            const mcqScore = mcqQuestions.length > 0 ? Math.round((correctCountMCQ / mcqQuestions.length) * 100) : 0;
+            const scoreColor = mcqScore >= 50 ? 'text-green-600' : 'text-red-600';
+
+            const resultsContainerId = `${type}-results`;
+            const resultsContainer = document.getElementById(resultsContainerId);
+            
+            let resultHeader = '';
+            if (type === 'mock') {
+                resultHeader = `
+                    <div class="text-center mb-6 border-b pb-6">
+                        <p class="text-lg">MCQ Score: <span class="text-2xl font-bold ${scoreColor}">${mcqScore}%</span> (${correctCountMCQ}/${mcqQuestions.length})</p>
+                        <p class="text-xl mt-4">Total Mock Score: <span id="total-mock-score" class="text-4xl font-bold text-blue-600">${correctCountMCQ}</span> / ${questions.length}</p>
+                        <p class="text-sm text-gray-500">(Click "Mark as Correct" on SAQs you answered correctly to update total score)</p>
+                    </div>`;
+            } else {
+                 resultHeader = `
+                    <div class="text-center mb-6">
+                        <p class="text-lg">You scored:</p>
+                        <p class="text-6xl font-bold ${scoreColor}">${mcqScore}%</p>
+                        <p class="text-gray-600">(on multiple-choice questions)</p>
+                        ${mcqScore < 50 ? '<p class="text-red-600 font-semibold mt-2">Keep studying! The pass mark is 50%.</p>' : '<p class="text-green-600 font-semibold mt-2">Great job! You are above the pass mark.</p>'}
+                    </div>`;
+            }
+
+            resultsContainer.innerHTML = `
+                <div class="bg-white p-8 rounded-lg shadow-lg max-w-4xl mx-auto">
+                    <h2 class="text-3xl font-bold text-center mb-4">Results</h2>
+                    ${resultHeader}
+                    <h3 class="text-xl font-bold mb-4">Detailed Review:</h3>
+                    <div id="review-container" class="max-h-[60vh] overflow-y-auto pr-4">${resultsHtml}</div>
+                    <button onclick="resetQuiz('${type}')" class="mt-6 w-full bg-blue-600 text-white font-bold py-3 px-4 rounded-lg hover:bg-blue-700 transition duration-300">Back to ${type === 'quiz' ? 'Quiz Setup' : 'Dashboard'}</button>
+                </div>
+            `;
+
+            document.getElementById(`${type}-active`).classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
+
+            if (type === 'mock') {
+                let selfScoredCorrect = 0;
+                document.getElementById('review-container').addEventListener('click', function(e) {
+                    if (e.target && e.target.classList.contains('self-score-btn') && !e.target.disabled) {
+                        selfScoredCorrect++;
+                        e.target.disabled = true;
+                        e.target.textContent = 'Correct!';
+                        const totalScore = correctCountMCQ + selfScoredCorrect;
+                        const totalPercentage = Math.round((totalScore / questions.length) * 100);
+                        const totalColor = totalPercentage >= 50 ? 'text-green-600' : 'text-blue-600';
+                        document.getElementById('total-mock-score').innerHTML = `<span class="${totalColor}">${totalScore} / ${questions.length} (${totalPercentage}%)</span>`;
+                    }
+                });
+            }
+
+            const totalScorePercentage = type === 'mock' 
+                ? Math.round((correctCountMCQ / questions.length) * 100)
+                : mcqScore;
+
+            const resultData = {
+                topic: type === 'mock' ? 'mock_exam' : questions[0].topic,
+                score: totalScorePercentage,
+                type: type === 'mock' ? 'Mock Exam' : 'Quiz',
+                timestamp: new Date().toISOString()
+            };
+            saveQuizResult(resultData);
+        }
+        
+        window.resetQuiz = function(type) {
+            document.getElementById(`${type}-results`).classList.add('hidden');
+            if (type === 'quiz') {
+                document.getElementById('quiz-setup').classList.remove('hidden');
+            } else { // mock
+                document.getElementById('mock-setup').classList.remove('hidden');
+                switchTab('dashboard');
+            }
+        }
+        
+        // --- Analytics Logic ---
+        function updateAnalytics() {
+            if (quizHistory.length === 0) return;
+
+            const scoreHistoryCtx = document.getElementById('score-history-chart').getContext('2d');
+            const historyData = quizHistory.slice().reverse();
+            if (scoreHistoryChart) scoreHistoryChart.destroy();
+            scoreHistoryChart = new Chart(scoreHistoryCtx, {
+                type: 'line',
+                data: {
+                    labels: historyData.map(r => new Date(r.timestamp).toLocaleDateString()),
+                    datasets: [{
+                        label: 'Quiz Score %',
+                        data: historyData.map(r => r.score),
+                        borderColor: 'rgb(59, 130, 246)',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.1,
+                        fill: true
+                    }]
+                },
+                options: { responsive: true, maintainAspectRatio: true }
+            });
+
+            const topicPerformanceCtx = document.getElementById('topic-performance-chart').getContext('2d');
+            const topicScores = {};
+            dbData.topics.forEach(topic => {
+                const topicResults = quizHistory.filter(r => r.topic === topic.id && r.type === 'Quiz');
+                if (topicResults.length > 0) {
+                    const avgScore = topicResults.reduce((acc, curr) => acc + curr.score, 0) / topicResults.length;
+                    topicScores[topic.name] = avgScore;
+                }
+            });
+
+            if (topicPerformanceChart) topicPerformanceChart.destroy();
+            topicPerformanceChart = new Chart(topicPerformanceCtx, {
+                type: 'bar',
+                data: {
+                    labels: Object.keys(topicScores),
+                    datasets: [{
+                        label: 'Average Score %',
+                        data: Object.values(topicScores),
+                        backgroundColor: Object.values(topicScores).map(score => score >= 50 ? 'rgba(22, 163, 74, 0.6)' : 'rgba(220, 38, 38, 0.6)'),
+                        borderColor: Object.values(topicScores).map(score => score >= 50 ? 'rgb(22, 163, 74)' : 'rgb(220, 38, 38)'),
+                        borderWidth: 1
+                    }]
+                },
+                options: { indexAxis: 'y', responsive: true, maintainAspectRatio: true, scales: { x: { beginAtZero: true, max: 100 } } }
+            });
+
+            const weakTopicsContainer = document.getElementById('weak-topics-container');
+            const weakTopics = Object.entries(topicScores).filter(([_, score]) => score < 50);
+            if (weakTopics.length > 0) {
+                weakTopicsContainer.innerHTML = `<p class="mb-2">Based on your average scores, you should focus on these topics:</p>
+                    <ul class="list-disc list-inside space-y-1">
+                        ${weakTopics.map(([name, score]) => `<li class="font-semibold text-red-700">${name} (Avg: ${Math.round(score)}%)</li>`).join('')}
+                    </ul>`;
+            } else if (Object.keys(topicScores).length > 0) {
+                 weakTopicsContainer.innerHTML = `<p class="text-green-700 font-semibold">Great work! You are averaging 50% or more in all topics you've been quizzed on.</p>`;
+            } else {
+                 weakTopicsContainer.innerHTML = `<p class="text-gray-500">Complete some quizzes to get personalized recommendations.</p>`;
+            }
+        }
+
+        // --- Modal Logic ---
+        function showModal(message) {
+            document.getElementById('modal-content').innerHTML = `<p>${message}</p>`;
+            document.getElementById('modal').classList.remove('hidden');
+        }
+
+    </script>
+</body>
+</html>
